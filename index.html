@@ -947,7 +947,7 @@ body.monitor-mode .pv-watermark { display:none; }
 <div class="app-copyright" style="background:var(--ink);position:fixed;
   top:var(--nav-h);left:0;right:0;z-index:199;font-size:9px;
   padding:2px 16px;border-bottom:1px solid rgba(255,255,255,0.05);">
-  마음을 잇는 징검다리 · dadamon2525@gmail.com · 교육 목적 전용
+  마음을 잇는 징검다리 · 교육 목적 전용
 </div>
 
 <!-- ══════════ PAGE: 대시보드 ══════════ -->
@@ -1662,8 +1662,7 @@ body.monitor-mode .pv-watermark { display:none; }
       <div style="font-family:'Nanum Myeongjo',serif;font-size:15px;font-weight:700;
         margin-bottom:8px;color:rgba(255,255,255,0.9);">저작권 표기</div>
       <div style="color:rgba(255,255,255,0.7);">
-        본 저작물은 <b style="color:white;">한국사 교사</b>
-        <b style="color:var(--accent);">dadamon2525@gmail.com</b>이<br>
+        본 저작물은 <b style="color:white;">한국사 교사</b>이<br>
         Claude(Anthropic)와 협력하여 설계·개발하였습니다.<br><br>
         <span style="font-size:11px;color:rgba(255,255,255,0.35);">
           마음을 잇는 징검다리 · 교육 목적 전용
@@ -4255,7 +4254,7 @@ body.monitor-mode .pv-watermark { display:none; }
   <div style="margin-top:24px;padding:16px 18px;background:var(--ink);border-radius:12px;
     text-align:center;font-size:11px;color:rgba(255,255,255,0.3);line-height:2;">
     마음을 잇는 징검다리 v1<br>
-    © 한국사 교사 dadamon2525@gmail.com<br>
+    © 한국사 교사<br>
     Claude(Anthropic)와 협력 개발 · 교육 목적 전용 · 무단 복제·배포 금지
   </div>
 
@@ -5762,7 +5761,7 @@ function generateGradRecord(targetName) {
             border-top:1px solid rgba(255,255,255,0.1);
             font-family:'Noto Sans KR',sans-serif;font-size:10px;
             color:rgba(255,255,255,0.15);text-align:center;line-height:1.8;">
-            마음을 잇는 징검다리<br>© dadamon2525@gmail.com · Claude와 협력 개발<br>
+            마음을 잇는 징검다리<br>© Claude와 협력 개발<br>
             교육 목적 전용 · 외부 공개 금지
           </div>
         </div>
@@ -6004,7 +6003,7 @@ function addPvWatermark() {
   const ci = localStorage.getItem('classInfo')||'학급';
   const yr = localStorage.getItem('schoolYear')||new Date().getFullYear();
   wm.innerHTML = `${yr} ${ci} · 담임 상담 자료 · 외부 공개 금지<br>
-    © dadamon2525@gmail.com · 마음을 잇는 징검다리 · Claude와 협력 개발`;
+    © 마음을 잇는 징검다리 · Claude와 협력 개발`;
   document.body.appendChild(wm);
 }
 
