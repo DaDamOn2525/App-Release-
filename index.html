@@ -979,6 +979,15 @@ body.monitor-mode .pv-watermark { display:none; }
 <div class="page active" id="pgDash">
 <div class="dash-container">
 
+  <!-- 오늘의 문장: 앱을 열 때마다 마음을 고르는 한 줄 -->
+  <div id="todayQuote" style="background:var(--ink);color:white;border-radius:14px;padding:18px 22px;margin-bottom:14px;position:relative;">
+    <div style="font-size:10px;letter-spacing:3px;color:rgba(255,255,255,0.4);margin-bottom:8px;">오늘의 문장 · 상담 전 마음 고르기</div>
+    <div id="tqText" style="font-family:'Nanum Myeongjo',serif;font-size:17px;line-height:1.9;font-weight:700;"></div>
+    <div id="tqSrc" style="font-size:12px;color:rgba(255,255,255,0.5);margin-top:6px;"></div>
+    <button onclick="showTodayQuote(true)" title="다른 문장" aria-label="다른 문장 보기"
+      style="position:absolute;right:14px;top:12px;background:none;border:1px solid rgba(255,255,255,0.25);color:rgba(255,255,255,0.7);border-radius:14px;padding:3px 10px;font-size:11px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;">다른 문장</button>
+  </div>
+
   <div class="summary-row">
     <div class="sum-card"><div class="sum-num" id="sumTotal">0</div><div class="sum-label">우리 반 학생</div></div>
     <div class="sum-card"><div class="sum-num" id="sumDone">0</div><div class="sum-label">마음 들여다보기 완료</div></div>
@@ -3881,21 +3890,9 @@ body.monitor-mode .pv-watermark { display:none; }
           <li>액세스 권한: <b>"모든 사용자"</b> → 배포 URL 복사</li>
           <li>이 앱 설정 탭 → GAS URL 입력란에 붙여넣기 → 저장</li>
         </ol>
-        <div style="background:var(--yellow-pale);border-left:3px solid var(--yellow);
-          border-radius:0 8px 8px 0;padding:10px 14px;margin:10px 0;font-size:12px;">
-          ⚠️ <b>안내 확인 중:</b> 아래 코드는 초기 기본형입니다. 배부받은 <b>V11_1 운영형 서버 시트</b>와 GAS 파일을 쓰시는 경우에는
-          그쪽 안내를 따르고, 아래 코드로 덮어쓰지 마세요.
-        </div>
         <div style="background:var(--blue-pale);border-left:3px solid var(--blue);
           border-radius:0 8px 8px 0;padding:10px 14px;margin:10px 0;font-size:12px;">
           ℹ️ CORS 오류가 뜨면 GAS 배포 시 액세스 권한을 <b>"모든 사람(익명 포함)"</b>으로 변경하세요.
-        </div>
-        <div style="background:var(--yellow-pale);border-left:3px solid var(--yellow);
-          border-radius:0 8px 8px 0;padding:10px 14px;margin:10px 0;font-size:12px;">
-          ⚠️ 이미 예전 버전 코드로 배포하셨다면 — 아래 최신 코드로
-          Apps Script 내용을 <b>전체 교체</b>한 뒤, <b>배포 → 배포 관리 → 수정(연필 아이콘)
-          → 새 버전 → 배포</b>로 다시 배포해야 "사전 상담 신청" 등 새 기능이 저장됩니다.
-          URL은 그대로 유지되니 앱 설정을 다시 바꿀 필요는 없습니다.
         </div>
         <div style="position:relative;">
           <button onclick="navigator.clipboard.writeText(document.getElementById('gasCodeBlock').textContent).then(()=>showToast('GAS 코드 복사됐습니다 ✓'))"
@@ -6716,6 +6713,25 @@ function closeLibraryItem(){
   document.getElementById('pgLibrary').scrollTop=0; window.scrollTo(0,0);
 }
 function initLibrary(){ renderLibraryList(); closeLibraryItem(); }
+
+
+// ══════════════ 오늘의 문장 (앱 안 내장 · 기록 없음) ══════════════
+const TODAY_QUOTES = [{"id": "P-001", "g": "내려놓기", "t": "지극한 사람은 마음을 거울처럼 쓴다. 비추되, 담아 두지 않는다.", "s": "『장자』 응제왕"}, {"id": "P-002", "g": "내려놓기", "t": "원한은 원한으로 그치지 않는다. 원한을 놓을 때 비로소 그친다.", "s": "『법구경』"}, {"id": "P-003", "g": "내려놓기", "t": "남이 알아주지 않아도 서운해하지 않는다면, 그 또한 군자가 아니겠는가.", "s": "『논어』 학이"}, {"id": "P-004", "g": "내려놓기", "t": "한때의 분을 참으면 백 날의 근심을 면한다.", "s": "『명심보감』"}, {"id": "P-005", "g": "내려놓기", "t": "분노가 가져오는 괴로움은 분노를 일으킨 일보다 크다.", "s": "마르쿠스 아우렐리우스, 『명상록』"}, {"id": "P-006", "g": "내려놓기", "t": "우리는 현실에서보다 상상 속에서 더 자주 괴로워한다.", "s": "세네카, 『도덕 서간』"}, {"id": "P-007", "g": "내려놓기", "t": "노하기를 더디 하는 사람은 용사보다 낫고, 자기 마음을 다스리는 사람은 성을 얻는 사람보다 낫다.", "s": "구약 「잠언」"}, {"id": "P-008", "g": "내려놓기", "t": "자기를 꾸짖기는 두텁게, 남을 꾸짖기는 가볍게 하면 원망이 멀어진다.", "s": "『논어』 위령공"}, {"id": "P-009", "g": "내려놓기", "t": "내가 바라지 않는 일을 남에게 하지 말라.", "s": "『논어』 위령공"}, {"id": "P-010", "g": "내려놓기", "t": "분노는 자비로, 악은 선으로 이겨라.", "s": "『법구경』"}, {"id": "P-011", "g": "숨 고르기", "t": "화를 다스리는 가장 좋은 약은 미루는 것이다.", "s": "세네카, 『분노에 대하여』"}, {"id": "P-012", "g": "숨 고르기", "t": "부드러운 대답은 노여움을 가라앉힌다.", "s": "구약 「잠언」"}, {"id": "P-013", "g": "숨 고르기", "t": "비움을 끝까지 이르게 하고, 고요함을 두텁게 지킨다.", "s": "『도덕경』 16장"}, {"id": "P-014", "g": "숨 고르기", "t": "말이 많으면 자주 막힌다. 속을 지키는 것만 못하다.", "s": "『도덕경』 5장"}, {"id": "P-015", "g": "숨 고르기", "t": "기쁨과 노여움과 슬픔과 즐거움이 일어나기 전의 자리를 중(中)이라 한다.", "s": "『중용』"}, {"id": "P-016", "g": "숨 고르기", "t": "천 리 길도 한 걸음에서 시작한다.", "s": "『도덕경』 64장"}, {"id": "P-017", "g": "숨 고르기", "t": "어려운 일은 쉬운 데서 시작된다.", "s": "『도덕경』 63장"}, {"id": "P-018", "g": "숨 고르기", "t": "가장 좋은 것은 물과 같다.", "s": "『도덕경』 8장"}, {"id": "P-019", "g": "숨 고르기", "t": "말을 아끼는 사람에게 앎이 있다.", "s": "구약 「잠언」"}, {"id": "P-020", "g": "숨 고르기", "t": "군자는 말에는 더디고, 행동에는 민첩하려 한다.", "s": "『논어』 이인"}, {"id": "P-021", "g": "다시 보기", "t": "사람을 괴롭히는 것은 일 그 자체가 아니라 그 일에 대한 생각이다.", "s": "에픽테토스, 『엥케이리디온』"}, {"id": "P-022", "g": "다시 보기", "t": "밖의 일 때문에 괴롭다면, 괴로움의 까닭은 그 일이 아니라 그 일에 대한 나의 판단이다.", "s": "마르쿠스 아우렐리우스, 『명상록』"}, {"id": "P-023", "g": "다시 보기", "t": "남을 아는 것은 지혜이고, 자기를 아는 것은 밝음이다.", "s": "『도덕경』 33장"}, {"id": "P-024", "g": "다시 보기", "t": "잘못하고도 고치지 않는 것, 그것이 잘못이다.", "s": "『논어』 위령공"}, {"id": "P-025", "g": "다시 보기", "t": "세 사람이 길을 가면 그중에 반드시 내 스승이 있다.", "s": "『논어』 술이"}, {"id": "P-026", "g": "다시 보기", "t": "오늘 만날 사람들이 나를 번거롭게 해도, 그들은 좋고 나쁨을 몰라서 그런 것임을 기억하라.", "s": "마르쿠스 아우렐리우스, 『명상록』"}, {"id": "P-027", "g": "다시 보기", "t": "쓸모없다고 여긴 것에도 쓸모가 있다.", "s": "『장자』 인간세"}, {"id": "P-028", "g": "다시 보기", "t": "남을 사랑하는 사람은 남도 늘 그를 사랑한다.", "s": "『맹자』 이루"}, {"id": "P-029", "g": "다시 보기", "t": "군자는 조화를 이루되 같아지지 않는다.", "s": "『논어』 자로"}, {"id": "P-030", "g": "다시 보기", "t": "마음이 거기 있지 않으면, 보아도 보이지 않고 들어도 들리지 않는다.", "s": "『대학』"}, {"id": "P-031", "g": "곁에 서기", "t": "듣기 전에 대답하는 것은 어리석음이요, 부끄러움이다.", "s": "구약 「잠언」"}, {"id": "P-032", "g": "곁에 서기", "t": "사람 마음의 속뜻은 깊은 물 같으나, 명철한 사람은 그것을 길어 올린다.", "s": "구약 「잠언」"}, {"id": "P-033", "g": "곁에 서기", "t": "함부로 하는 말은 칼처럼 찌르고, 지혜로운 사람의 혀는 약이 된다.", "s": "구약 「잠언」"}, {"id": "P-034", "g": "곁에 서기", "t": "덕은 외롭지 않아, 반드시 이웃이 있다.", "s": "『논어』 이인"}, {"id": "P-035", "g": "곁에 서기", "t": "은혜와 의리를 널리 베풀라. 사람 사는 곳에서 어디선들 다시 만나지 않겠는가.", "s": "『명심보감』"}, {"id": "P-036", "g": "곁에 서기", "t": "남의 어려움을 차마 외면하지 못하는 마음이 사람에게는 있다.", "s": "『맹자』 공손추"}, {"id": "P-037", "g": "곁에 서기", "t": "남이 나를 알아주지 않음을 걱정하지 말고, 내가 남을 알지 못함을 걱정하라.", "s": "『논어』 학이"}, {"id": "P-038", "g": "곁에 서기", "t": "천하에 물보다 부드럽고 약한 것이 없으나, 굳세고 강한 것을 이기는 데 물을 앞서는 것이 없다.", "s": "『도덕경』 78장"}, {"id": "P-039", "g": "곁에 서기", "t": "마음이 모든 것에 앞선다. 마음이 주인이 되어 모든 것을 만든다.", "s": "『법구경』"}, {"id": "P-040", "g": "곁에 서기", "t": "아는 것을 안다 하고, 모르는 것을 모른다 하는 것. 이것이 아는 것이다.", "s": "『논어』 위정"}];
+function showTodayQuote(forceNew){
+  const tx=document.getElementById('tqText'), sr=document.getElementById('tqSrc');
+  if(!tx||!TODAY_QUOTES.length) return;
+  let last='', lastG='';
+  try{ last=localStorage.getItem('tqLast')||''; lastG=localStorage.getItem('tqLastGroup')||''; }catch(e){}
+  const groups=['내려놓기','숨 고르기','다시 보기','곁에 서기'];
+  // 직전 문장·직전 묶음을 피해 다른 묶음에서 고른다
+  let gs=groups.filter(g=>g!==lastG); if(!gs.length) gs=groups;
+  const pool=TODAY_QUOTES.filter(q=>gs.includes(q.g)&&q.id!==last);
+  const q=pool[Math.floor(Math.random()*pool.length)]||TODAY_QUOTES[0];
+  tx.textContent='\u201C'+q.t+'\u201D';
+  sr.textContent='— '+q.s;
+  try{ localStorage.setItem('tqLast',q.id); localStorage.setItem('tqLastGroup',q.g); }catch(e){}
+}
+document.addEventListener('DOMContentLoaded',()=>showTodayQuote());
 
 function goPage(id, btn) {
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
