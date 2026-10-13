@@ -1380,11 +1380,15 @@ body.monitor-mode .pv-watermark { display:none; }
       구글 Apps Script 배포 후 생성된 <b>담임 개인의</b> 웹앱 URL을 입력하세요.<br>
       아직 만들지 않으셨다면 <b>매뉴얼</b> 탭 또는 배부받으신 시작 가이드를 참고하세요.
     </div>
-    <div class="field-label" style="margin-top:10px;">관리 키</div>
-    <input class="field-input" id="gasKey" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" style="-webkit-text-security:disc;text-security:disc;" placeholder="GAS 코드의 ADMIN_KEY에 적은 문장과 똑같이">
+    <div class="field-label" style="margin-top:10px;">관리 키 <span style="font-weight:500;color:var(--ink-faint);">· 나만 아는 짧은 문구 (한글 가능)</span></div>
+    <div style="display:flex;gap:6px;">
+      <input class="field-input" id="gasKey" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" style="flex:1;-webkit-text-security:disc;text-security:disc;" oninput="updateGasKeyCount()" placeholder="예: 바람커피 (GAS 코드의 ADMIN_KEY와 똑같이)">
+      <button type="button" onclick="toggleGasKeyView()" style="padding:0 12px;border:1px solid var(--border);background:var(--paper);border-radius:8px;cursor:pointer;font-size:12px;">보기</button>
+    </div>
+    <div id="gasKeyCount" style="font-size:11px;color:var(--ink-faint);margin-top:3px;"></div>
     <div class="field-desc">
       학생 링크에는 GAS 주소가 들어가므로, 관리 키가 없으면 학생이 시트의 기록을 읽거나 쓸 수 없도록 막아 둡니다.<br>
-      <b>이 문장은 학생에게 알려 주지 마세요.</b> 한글도 쓸 수 있습니다. 이 기기의 브라우저에만 저장됩니다.
+      <b>이 문구는 학생에게 알려 주지 마세요.</b> 띄어쓰기는 무시되고, 이 기기의 브라우저에만 저장됩니다.
     </div>
     <div style="display:flex;gap:8px;flex-wrap:wrap;">
       <button class="save-settings-btn" onclick="saveSettings()"
@@ -3769,10 +3773,10 @@ body.monitor-mode .pv-watermark { display:none; }
           <li>시트 이름을 <b>"담임상담2026"</b> 등으로 저장</li>
           <li>상단 메뉴 <b>확장 프로그램 → Apps Script</b></li>
           <li>아래 GAS 코드 전체를 복사해서 기존 코드를 지우고 붙여넣기</li>
-          <li>코드 위쪽의 <b>ADMIN_KEY</b> 따옴표 안을 <b>나만 아는 문장</b>으로 바꾸고 <b>저장</b> (학생에게 알려 주지 않습니다)</li>
+          <li>코드 위쪽의 <b>ADMIN_KEY</b> 따옴표 안을 <b>나만 아는 짧은 문구</b>(한글 가능, 예: 바람커피)로 바꾸고 <b>저장</b> (학생에게 알려 주지 않습니다)</li>
           <li>함수 선택 창에서 <b>setupSheets</b>를 고르고 <b>실행</b> (권한 허용) — 필요한 탭이 자동으로 만들어집니다</li>
           <li><b>배포 → 새 배포 → 웹 앱</b> · 실행 사용자 <b>나</b> · 액세스 <b>모든 사용자</b> → 웹 앱 URL 복사</li>
-          <li>이 앱 설정 탭 → GAS URL 입력란에 붙여넣고, <b>관리 키</b> 칸에 위에서 정한 문장을 똑같이 입력 → 저장 (연결 성공 옆에 "관리 키 확인됨"이 뜨면 완료)</li>
+          <li>이 앱 설정 탭 → GAS URL 입력란에 붙여넣고, <b>관리 키</b> 칸에 위에서 정한 문구를 똑같이 입력 → 저장 (연결 성공 옆에 "관리 키 확인됨"이 뜨면 완료)</li>
         </ol>
         <div style="background:var(--blue-pale);border-left:3px solid var(--blue);
           border-radius:0 8px 8px 0;padding:10px 14px;margin:10px 0;font-size:12px;">
@@ -3804,11 +3808,12 @@ body.monitor-mode .pv-watermark { display:none; }
  *  - 위험 판정은 이 서버에서 하지 않습니다(앱의 안전 신호 안내가 담당).
  */
 
-var VERSION = 'V11.1-rebuild-2';
+var VERSION = 'V11.1-rebuild-3';
 var TZ = 'Asia/Seoul';
-// ★ 관리 키: 아래 따옴표 안을 본인만 아는 문장으로 바꾸세요(예: '우리반-2026-봄바람'). 앱 설정 탭의 '관리 키'에도 똑같이 입력합니다.
+// ★ 관리 키: 아래 따옴표 안을 본인만 아는 짧은 문구로 바꾸세요. 한글도 됩니다(예: '바람커피'). 앱 설정 탭의 '관리 키'에도 똑같이 입력합니다.
+//   띄어쓰기는 무시되니 붙여 쓰는 것이 편하고, 따옴표(')는 지우지 마세요.
 //   학생에게 보내는 링크에는 이 키가 들어가지 않습니다. 키가 없으면 학생 응답을 받는 일 말고는 아무것도 열리지 않습니다.
-var ADMIN_KEY = '여기에-나만-아는-문장';
+var ADMIN_KEY = '여기에-나만-아는-문구';
 var HIDE_SAMPLE_ROWS = true;   // student_id가 SAMPLE_ 로 시작하는 예시 행은 앱에 보내지 않음
 
 var TAB = {
@@ -3985,8 +3990,9 @@ function stats_() {
 
 /* ───────────── 관리 키 ───────────── */
 
-function keyConfigured_() { return !!ADMIN_KEY &amp;&amp; ADMIN_KEY !== '여기에-나만-아는-문장'; }
-function isAdmin_(key) { return keyConfigured_() &amp;&amp; String(key || '') === ADMIN_KEY; }
+function keyConfigured_() { return !!ADMIN_KEY &amp;&amp; ADMIN_KEY !== '여기에-나만-아는-문구'; }
+function normKey_(k) { return String(k || '').replace(/\s+/g, '').normalize('NFC'); }
+function isAdmin_(key) { return keyConfigured_() &amp;&amp; normKey_(key) !== '' &amp;&amp; normKey_(key) === normKey_(ADMIN_KEY); }
 
 /* ───────────── 학생 찾기·학급 일괄 링크 ───────────── */
 
@@ -8363,7 +8369,7 @@ function loadSettingsToUI() {
   const gasEl = document.getElementById('gasUrl');
   if (gasEl) gasEl.value = gasUrl;
   const gkEl = document.getElementById('gasKey');
-  if (gkEl) gkEl.value = gasKey();
+  if (gkEl) { gkEl.value = gasKey(); updateGasKeyCount(); }
 
   // 담임 이름
   const tn = localStorage.getItem('teacherName') || '';
@@ -8399,7 +8405,9 @@ function isValidGasUrl(url) {
 }
 
 // 관리 키: 담임만 아는 문장. 학생에게 보내는 링크에는 넣지 않습니다.
-function gasKey(){ try{ return localStorage.getItem('gasKey')||''; }catch(e){ return ''; } }
+function updateGasKeyCount(){ const el=document.getElementById('gasKey'), c=document.getElementById('gasKeyCount'); if(!el||!c) return; const n=(el.value||'').replace(/\s+/g,'').length; c.textContent = n ? `${n}글자` : ''; }
+function toggleGasKeyView(){ const el=document.getElementById('gasKey'); if(!el) return; const hid = el.style.webkitTextSecurity!=='none'; el.style.webkitTextSecurity = hid ? 'none' : 'disc'; el.style.textSecurity = hid ? 'none' : 'disc'; }
+function gasKey(){ try{ return (localStorage.getItem('gasKey')||'').replace(/\s+/g,'').normalize('NFC'); }catch(e){ return ''; } }
 function KQ(){ const k=gasKey(); return k ? '&key='+encodeURIComponent(k) : ''; }
 
 // ── GAS URL 저장 + 자동 연결 테스트 ─────────────────────────
@@ -8422,7 +8430,7 @@ async function saveSettings() {
   }
 
   localStorage.setItem('gasUrl', url);
-  { const gk=document.getElementById('gasKey'); if(gk) localStorage.setItem('gasKey', (gk.value||'').trim()); }
+  { const gk=document.getElementById('gasKey'); if(gk) localStorage.setItem('gasKey', (gk.value||'').replace(/\s+/g,'').normalize('NFC')); }
   APP.gasUrl = url;
   updateGasStatus();
   showToast('URL 저장 완료. 연결 확인 중...');
@@ -8481,7 +8489,7 @@ async function testConnection() {
 
   try {
     // GAS 웹앱은 CORS 헤더를 자동 반환하므로 응답을 직접 파싱 가능
-    const typedKey=(document.getElementById('gasKey')?.value||'').trim(); const kq=typedKey?'&key='+encodeURIComponent(typedKey):KQ();
+    const typedKey=(document.getElementById('gasKey')?.value||'').replace(/\s+/g,'').normalize('NFC'); const kq=typedKey?'&key='+encodeURIComponent(typedKey):KQ();
     const res = await fetch(`${url}?type=ping${kq}`, { method: 'GET' });
     if (!res.ok) throw new Error('HTTP ' + res.status);
     const data = await res.json();
@@ -8492,7 +8500,7 @@ async function testConnection() {
         const version = data.version || data.data?.meta?.version || '연결됨';
         const when = data.time || data.data?.meta?.fetched_at;
         const keyNote = data.admin === true ? ' · 관리 키 확인됨'
-          : (data.keyConfigured === false ? ' · ⚠️ GAS 코드의 ADMIN_KEY를 아직 바꾸지 않았습니다' : (data.admin === false ? ' · ⚠️ 관리 키가 맞지 않습니다' : ''));
+          : (data.keyConfigured === false ? ' · ⚠️ GAS 코드의 ADMIN_KEY 문구를 아직 바꾸지 않았습니다' : (data.admin === false ? ' · ⚠️ 관리 키가 맞지 않습니다' : ''));
         st.innerHTML = `✓ 연결 성공! GAS ${version}${keyNote}` +
           (when ? `<span style="font-size:11px;color:var(--ink-light);"> · 응답 시각 ${new Date(when).toLocaleTimeString('ko-KR')}</span>` : '');
       }
