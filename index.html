@@ -462,15 +462,7 @@ body.monitor-mode .pv-watermark { display:none; }
 .rec-tab{padding:7px 14px;border-radius:8px;border:1.5px solid var(--border);
   background:var(--bg);color:var(--ink-light);font-size:13px;cursor:pointer;
   font-family:'Noto Sans KR',sans-serif;transition:all 0.2s;}
-.rec-tab-disabled{opacity:.52;cursor:not-allowed;background:var(--bg);}
-.rec-tab-disabled .future-label{font-size:10px;color:var(--ink-faint);font-weight:500;}
-.rec-tab-disabled:disabled{opacity:.52;}
 .rec-tab.active{background:var(--accent);border-color:var(--accent);color:white;}
-.stt-box{background:var(--bg);border:1.5px solid var(--border);border-radius:10px;
-  padding:14px;min-height:140px;font-size:14px;line-height:1.9;color:var(--ink);
-  overflow-y:auto;max-height:220px;margin-bottom:10px;}
-.stt-interim{color:var(--ink-faint);font-style:italic;}
-.stt-controls{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
 .rec-btn{display:flex;align-items:center;gap:7px;padding:10px 18px;border-radius:10px;
   border:none;font-size:13px;font-family:'Noto Sans KR',sans-serif;font-weight:500;cursor:pointer;}
 .rec-btn.start{background:var(--red);color:white;}
@@ -1303,149 +1295,6 @@ body.monitor-mode .pv-watermark { display:none; }
   <div id="spanel2" style="display:none;">
     <div class="record-tabs">
       <button class="rec-tab active" id="rtab1" onclick="switchRecTab(1)">✍️ 직접 입력</button>
-      <button class="rec-tab rec-tab-disabled" id="rtab0" type="button" disabled aria-disabled="true">🎤 실시간 녹음 <span class="future-label">(향후 조정 예정)</span></button>
-      <button class="rec-tab rec-tab-disabled" id="rtab2" type="button" disabled aria-disabled="true">📱 오디오 파일 <span class="future-label">(향후 조정 예정)</span></button>
-    </div>
-
-    <!-- 실시간 STT -->
-    <div id="rpanel0" style="display:none;">
-      <div class="stt-box" id="sttBox">
-        <span style="color:var(--ink-faint);font-size:13px;">마이크 권한을 허용한 뒤 <b>녹음 시작</b>을 눌러 주세요.<br>말하는 내용은 아래에 실시간 전사됩니다.</span>
-      </div>
-      <div class="stt-controls">
-        <button class="rec-btn start" id="sttBtn" onclick="toggleSTT()">● 녹음 시작</button>
-        <div class="rec-timer" id="sttTimer" style="display:none;">00:00</div>
-        <button class="clear-btn" onclick="clearSTT()">초기화</button>
-      </div>
-      <div id="sttStatus" style="margin-top:8px;font-size:12px;color:var(--ink-light);">상태: 대기 중</div>
-      <div style="margin-top:10px;padding:11px 13px;background:var(--bg);border:1px solid var(--border);border-radius:9px;font-size:12px;line-height:1.7;color:var(--ink-light);">
-        <b style="color:var(--ink);">🎙 첫 테스트 문장</b><br>
-        “선생님, 요즘 친구들과 있을 때 조금 불편해요. 특히 쉬는 시간에 혼자 있는 경우가 많아요.”
-        <br><span style="font-size:11px;">※ 테스트가 끝나면 전사 내용을 확인한 뒤 <b>직접 입력</b> 탭에서 분석·저장할 수 있습니다.</span>
-      </div>
-      <div class="alert-box info" style="margin-top:10px;font-size:12px;">
-        <span>ℹ️</span>
-        <div>
-          이 단계는 <b>오디오 파일을 저장하는 기능이 아니라 브라우저의 실시간 음성 인식(STT)</b> 테스트입니다.<br>
-          크롬에서 가장 잘 작동합니다. 전사 결과를 확인한 뒤 저장 여부를 선생님이 결정합니다.
-        </div>
-      </div>
-    </div>
-
-    <!-- 📱 오디오 파일 탭 -->
-    <div id="rpanel2" style="display:none;">
-
-      <!-- 스마트폰 사용 안내 -->
-      <div style="background:var(--blue-pale);border:1.5px solid var(--blue);border-radius:10px;
-        padding:14px 16px;margin-bottom:14px;font-size:13px;color:var(--ink);line-height:2;">
-        📱 <b>스마트폰 녹음 파일 사용 방법</b><br>
-        <span style="font-size:12px;color:var(--ink-light);">
-          ① 스마트폰 기본 녹음 앱으로 면담 녹음 (m4a·mp3·wav)<br>
-          ② 카카오톡·이메일로 PC에 파일 전송<br>
-          ③ (향후 조정 예정) 오디오 파일 업로드 → 음성→텍스트 변환 → 결과 확인 → 상담 내용 분석
-        </span>
-      </div>
-
-      <!-- 파일 드롭존 -->
-      <div id="audioDropZone"
-        onclick="document.getElementById('audioFileInput').click()"
-        ondragover="event.preventDefault();this.style.borderColor='var(--accent)'"
-        ondragleave="this.style.borderColor='var(--border)'"
-        ondrop="handleAudioDrop(event)"
-        style="border:2px dashed var(--border);border-radius:12px;padding:28px 20px;
-          text-align:center;cursor:pointer;transition:all 0.2s;background:var(--bg);margin-bottom:10px;">
-        <div style="font-size:32px;margin-bottom:8px;">🎵</div>
-        <div style="font-size:14px;color:var(--ink-light);line-height:2;">
-          <b style="color:var(--accent);">클릭</b>하거나 파일을 드래그하세요<br>
-          <span style="font-size:12px;">m4a · mp3 · wav · aac · ogg 지원</span>
-        </div>
-      </div>
-      <input type="file" id="audioFileInput" accept="audio/*,.m4a,.mp3,.wav,.aac,.ogg"
-        style="display:none;" onchange="handleAudioFile(event)">
-
-      <!-- 파일 선택 확인 -->
-      <div id="audioFileInfo" style="display:none;margin-bottom:12px;">
-        <div style="background:var(--green-pale);border:1px solid var(--green);border-radius:8px;
-          padding:10px 14px;display:flex;align-items:center;gap:10px;">
-          <span style="font-size:20px;">🎵</span>
-          <div style="flex:1;">
-            <div style="font-size:13px;font-weight:700;color:var(--green);" id="audioFileName">—</div>
-            <div style="font-size:11px;color:var(--ink-light);" id="audioFileSize">—</div>
-          </div>
-          <button onclick="clearAudioFile()"
-            style="background:none;border:1px solid var(--border);border-radius:6px;
-              padding:3px 8px;font-size:11px;color:var(--ink-light);cursor:pointer;">✕ 취소</button>
-        </div>
-      </div>
-
-      <!-- ② 음성 → 텍스트 -->
-      <div id="audioConvertWrap" style="display:none;">
-        <div style="background:var(--blue-pale);border:1.5px solid var(--blue);
-          border-radius:10px;padding:14px 16px;margin-bottom:12px;">
-          <div style="font-size:13px;font-weight:700;color:var(--blue);margin-bottom:8px;">
-            ② 음성을 텍스트로 변환
-          </div>
-          <div style="font-size:12px;color:var(--ink);line-height:1.8;margin-bottom:10px;">
-            파일이 준비되었습니다. 이제 <b>음성 → 텍스트(STT)</b> 변환을 진행합니다.
-            변환이 끝나면 아래에서 원문을 확인·수정한 뒤 분석 단계로 넘어갑니다.
-          </div>
-          <button id="audioConvertBtn" onclick="convertAudioFile()"
-            style="width:100%;padding:12px;background:var(--accent);color:white;border:none;
-              border-radius:8px;font-size:14px;font-family:'Noto Sans KR',sans-serif;
-              font-weight:700;cursor:pointer;">
-            🎙️ 음성을 텍스트로 변환하기
-          </button>
-          <div id="audioConvertNotice" style="margin-top:9px;font-size:11px;color:var(--ink-light);">
-            ※ 이 버튼은 연결된 Google Apps Script를 통해 실제 STT 변환을 실행합니다. API 키는 브라우저에 저장하지 않습니다.
-          </div>
-        </div>
-
-        <!-- 변환 진행 -->
-        <div id="audioConvertProgress" style="display:none;margin-top:10px;">
-          <div style="height:6px;background:var(--border);border-radius:3px;overflow:hidden;margin-bottom:6px;">
-            <div id="audioProgressFill" style="height:100%;background:linear-gradient(90deg,var(--blue),var(--accent));
-              border-radius:3px;transition:width 0.4s ease;width:0%;"></div>
-          </div>
-          <div style="font-size:12px;color:var(--ink-light);" id="audioProgressLabel">변환 준비 중...</div>
-        </div>
-
-        <!-- API 없이 변환한 결과 붙여넣기 -->
-        <div style="background:var(--green-pale);border:1.5px solid var(--green);
-          border-radius:10px;padding:14px 16px;margin-top:12px;">
-          <div style="font-size:13px;font-weight:700;color:var(--green);margin-bottom:7px;">
-            📋 STT 결과를 이미 가지고 있다면
-          </div>
-          <div style="font-size:12px;color:var(--ink);line-height:1.7;margin-bottom:8px;">
-            네이버 CLOVA Note 등에서 변환한 텍스트를 여기에 붙여넣으세요.
-            <b>붙여넣기 → 확인 → 분석</b>의 순서로 진행됩니다.
-          </div>
-          <textarea id="audioManualTranscript" style="width:100%;height:100px;border:1px solid var(--border);
-            border-radius:8px;padding:10px;font-size:13px;font-family:'Noto Sans KR',sans-serif;
-            color:var(--ink);background:var(--bg);resize:vertical;outline:none;line-height:1.7;"
-            placeholder="변환된 상담 내용을 붙여넣으세요."></textarea>
-          <button onclick="useManualAudioTranscript()" style="width:100%;padding:10px;
-            background:var(--green);color:white;border:none;border-radius:8px;font-size:13px;
-            font-family:'Noto Sans KR',sans-serif;font-weight:700;cursor:pointer;margin-top:8px;">
-            ✓ 붙여넣은 텍스트를 변환 결과로 확인하기 →
-          </button>
-        </div>
-
-        <!-- 변환 결과 편집 -->
-        <div id="audioResultWrap" style="display:none;margin-top:12px;">
-          <div style="font-size:11px;font-weight:700;color:var(--green);letter-spacing:1px;
-            margin-bottom:6px;">③ 변환된 내용을 확인·수정하세요</div>
-          <textarea id="audioTranscript" style="width:100%;height:150px;border:1.5px solid var(--green);
-            border-radius:10px;padding:12px;font-size:13px;font-family:'Noto Sans KR',sans-serif;
-            color:var(--ink);background:var(--bg);resize:vertical;outline:none;line-height:1.8;"
-            placeholder="변환된 내용이 여기에 나타납니다."></textarea>
-          <button onclick="useAudioTranscript()" style="width:100%;padding:12px;
-            background:var(--accent);color:white;border:none;border-radius:10px;
-            font-size:14px;font-family:'Noto Sans KR',sans-serif;font-weight:500;
-            cursor:pointer;margin-top:8px;">
-            📋 이 내용으로 상담 내용 분석하기 →
-          </button>
-        </div>
-      </div>
     </div>
 
     <!-- 직접 입력 -->
@@ -3800,7 +3649,7 @@ body.monitor-mode .pv-watermark { display:none; }
               color:white;display:flex;align-items:center;justify-content:center;
               font-size:12px;font-weight:700;flex-shrink:0;">5</div>
             <div>
-              <b>면담 기록</b> — 직접 입력을 기본으로 사용 → 상담 내용 분석 (음성 기능은 향후 조정 예정)<br>
+              <b>면담 기록</b> — 직접 입력을 기본으로 사용 → 상담 내용 분석 <br>
               <span style="font-size:12px;color:var(--ink-light);">분석 결과는 성장 일지에 자동 저장.</span>
             </div>
           </div>
@@ -3998,6 +3847,33 @@ body.monitor-mode .pv-watermark { display:none; }
       </div>
     </div>
 
+    <!-- 서재 안내 -->
+    <div class="manual-step">
+      <div class="ms-header"><span class="ms-badge">참고</span>
+        <div><div class="ms-title">📚 서재 — 무엇이 있고, 언제 읽나</div>
+          <div class="ms-desc">상담의 기초 다음 탭 · 읽는 데 한 편에 3~5분</div></div>
+      </div>
+      <div class="ms-body">
+        <b>무엇이 들어 있나요</b>
+        <ul style="margin:6px 0 12px;padding-left:18px;">
+          <li>담임이 면담에서 자주 부딪히는 장면을 다룬 글 <b>10편</b> — 학생의 말과 내 해석을 구분하기, 감정 인정하기, 질문의 순서, 갈등과 괴롭힘의 구분, 공부를 미루는 아이, 감정 신호 알아차리기, 진로 이야기, 상담 뒤 돌아보기, 안부 묻기.</li>
+          <li><b>혼자 돕기 어렵다고 느껴질 때</b> 편 <b>1편</b> — 누구와 상의하고 어디에 연락할지 정리한 글입니다. 목록 맨 위에 따로 놓여 있습니다.</li>
+        </ul>
+        <b>언제 쓰나요</b>
+        <ul style="margin:6px 0 12px;padding-left:18px;">
+          <li><b>면담 직전:</b> 오늘 만날 학생의 상황과 가까운 글 한 편을 읽고 들어갑니다.</li>
+          <li><b>면담 직후:</b> 마음에 걸리는 장면이 있을 때 다시 읽어 봅니다.</li>
+          <li><b>판단이 서지 않을 때:</b> 안전과 관련된 걱정이 들면 먼저 맨 위의 "혼자 돕기 어려울 때" 글을 봅니다.</li>
+        </ul>
+        <b>알아 두세요</b>
+        <ul style="margin:6px 0 0;padding-left:18px;">
+          <li>글은 정답이 아니라 <b>질문을 고르기 전에 한 번 멈추는 자료</b>입니다. 학생을 판정하는 기준이 아닙니다.</li>
+          <li>읽은 기록은 남지 않고, 시트 연결 없이도 열립니다. 새 글이 더해지면 새로고침 후 보입니다.</li>
+          <li>대시보드 맨 위의 <b>오늘의 문장</b>은 앱을 열 때마다 바뀝니다. 상담 전 마음을 고르는 한 줄이며, <b>다른 문장</b>을 눌러 바꿀 수 있습니다.</li>
+        </ul>
+      </div>
+    </div>
+
   </div><!-- /mpanel0 -->
 
   <!-- ═══ 레벨 1: 설정했어요 ═══ -->
@@ -4052,6 +3928,14 @@ body.monitor-mode .pv-watermark { display:none; }
           </div>
           <div style="background:var(--bg);border-radius:8px;padding:10px 14px;
             display:flex;align-items:flex-start;gap:10px;">
+            <span style="font-size:18px;flex-shrink:0;">📚</span>
+            <div>
+              <b>서재</b><br>
+              <span style="font-size:12px;color:var(--ink-light);">질문을 하기 전에 읽는 짧은 글 11편. 면담 전후에 5분 읽고 마음을 정리하는 용도입니다.</span>
+            </div>
+          </div>
+          <div style="background:var(--bg);border-radius:8px;padding:10px 14px;
+            display:flex;align-items:flex-start;gap:10px;">
             <span style="font-size:18px;flex-shrink:0;">⚙️</span>
             <div>
               <b>설정</b><br>
@@ -4087,7 +3971,7 @@ body.monitor-mode .pv-watermark { display:none; }
           <div style="text-align:center;color:var(--ink-faint);font-size:12px;">↓</div>
           <div style="padding:8px 12px;background:var(--green-pale);border-radius:8px;
             font-size:13px;border-left:3px solid var(--green);">
-            <b>④ 면담 기록 탭</b> — 직접 입력 → 상담 내용 분석하기 (음성 기능은 향후 조정 예정)
+            <b>④ 면담 기록 탭</b> — 직접 입력 → 상담 내용 분석하기 
           </div>
           <div style="text-align:center;color:var(--ink-faint);font-size:12px;">↓</div>
           <div style="padding:8px 12px;background:var(--bg);border-radius:8px;
@@ -4271,14 +4155,6 @@ body.monitor-mode .pv-watermark { display:none; }
       </div>
       <div class="ms-body">
         <div style="display:flex;flex-direction:column;gap:8px;">
-          <div style="background:var(--bg);border-radius:8px;padding:12px 14px;">
-            <div style="font-size:13px;font-weight:700;color:var(--accent);margin-bottom:4px;">
-              Q. 실시간 녹음 기능은 언제 사용할 수 있나요?
-            </div>
-            <div style="font-size:13px;color:var(--ink);line-height:1.7;">
-              크롬(Chrome) 브라우저를 사용해주세요. 사파리·엣지에서는 제한이 있습니다.<br>
-              크롬에서도 안 되면: 주소창 왼쪽 🔒 클릭 → 마이크 허용
-            </div>
           </div>
           <div style="background:var(--bg);border-radius:8px;padding:12px 14px;">
             <div style="font-size:13px;font-weight:700;color:var(--accent);margin-bottom:4px;">
@@ -4345,9 +4221,7 @@ const APP = {
   stepDone: [false,false,false,false,false],
   stepQs: [[],[],[],[],[]],
   timerInt: null, timerSec: 0, timerOn: false,
-  sttRec: null, sttInt: null, sttSec: 0, sttOn: false, sttRestartTimer: null,
-  sttFinal: '',
-};
+  };
 
 // ══════════════ 학생 데이터 ══════════════
 // V11.2.6부터 운영 화면은 샘플 학생을 기본 표시하지 않습니다.
@@ -7648,18 +7522,7 @@ function completeInterview(){showToast('면담 완료! 기록 탭에서 내용�
 
 // ── 면담 기록 ──
 function switchRecTab(i) {
-  // 현재 운영 버전에서는 직접 입력을 기본으로 사용합니다.
-  // 음성 기능(실시간 녹음/오디오 파일)은 향후 조정 예정이며, 비활성화 상태에서는 전환하지 않습니다.
-  if((i===0 || i===2) && document.getElementById('rtab'+i)?.disabled) {
-    showToast('음성 기능은 향후 조정 예정입니다. 현재는 직접 입력을 이용해주세요.');
-    i=1;
-  }
-  [0,1,2].forEach(j=>{
-    const btn=document.getElementById('rtab'+j);
-    if(btn) btn.classList.toggle('active',j===i);
-    const panel=document.getElementById('rpanel'+j);
-    if(panel) panel.style.display=j===i?'block':'none';
-  });
+  // 면담 기록은 직접 입력만 사용합니다(음성 기능은 폐지).
 }
 
 // ── 학년반 인라인 입력 ──
@@ -7669,275 +7532,11 @@ function updateClassLabel(val) {
   if(ci) ci.value=val;
 }
 
-// ── 오디오 파일 처리 ──
-function handleAudioDrop(e) {
-  e.preventDefault();
-  document.getElementById('audioDropZone').style.borderColor='var(--border)';
-  const file=e.dataTransfer.files[0];
-  if(file) processAudioFile(file);
-}
-function handleAudioFile(e) { if(e.target.files[0]) processAudioFile(e.target.files[0]); }
-function processAudioFile(file) {
-  document.getElementById('audioFileName').textContent=file.name;
-  document.getElementById('audioFileSize').textContent=(file.size/1024/1024).toFixed(1)+'MB';
-  document.getElementById('audioFileInfo').style.display='block';
-  document.getElementById('audioConvertWrap').style.display='block';
-  document.getElementById('audioDropZone').style.display='none';
-  APP.audioFile=file;
-}
-function clearAudioFile() {
-  document.getElementById('audioFileInfo').style.display='none';
-  document.getElementById('audioConvertWrap').style.display='none';
-  document.getElementById('audioDropZone').style.display='block';
-  document.getElementById('audioResultWrap').style.display='none';
-  document.getElementById('audioFileInput').value='';
-  APP.audioFile=null;
-}
-async function convertAudioFile() {
-  if(!APP.audioFile) { showToast('먼저 음성 파일을 선택해주세요'); return; }
-  const prog=document.getElementById('audioConvertProgress');
-  const fill=document.getElementById('audioProgressFill');
-  const label=document.getElementById('audioProgressLabel');
-  const btn=document.getElementById('audioConvertBtn');
-  const notice=document.getElementById('audioConvertNotice');
-
-  if(!APP.gasUrl) {
-    notice.innerHTML='⚠️ <b>Google Sheets 연결이 먼저 필요합니다.</b> 설정에서 GAS URL을 연결한 뒤 다시 시도해주세요.';
-    notice.style.color='var(--accent)';
-    showToast('먼저 Google Sheets 연결을 설정해주세요.');
-    return;
-  }
-
-  try {
-    btn.disabled=true;
-    btn.style.opacity='.65';
-    prog.style.display='block';
-    fill.style.width='10%'; label.textContent='① 음성 파일을 준비하는 중...';
-
-    // 브라우저에서 파일을 base64로 만들어 GAS로 전달합니다.
-    // API 키는 브라우저에 두지 않고 GAS Script Properties에 보관합니다.
-    const arrayBuffer=await APP.audioFile.arrayBuffer();
-    const bytes=new Uint8Array(arrayBuffer);
-    let binary='';
-    const chunk=0x8000;
-    for(let i=0;i<bytes.length;i+=chunk){
-      binary += String.fromCharCode(...bytes.subarray(i, Math.min(i+chunk, bytes.length)));
-    }
-    const base64=btoa(binary);
-
-    fill.style.width='30%'; label.textContent='② 안전한 연결을 통해 STT 변환을 요청하는 중...';
-    const payload={
-      type:'transcribe',
-      filename:APP.audioFile.name,
-      mime_type:APP.audioFile.type||'audio/mp4',
-      file_base64:base64,
-      language:'ko'
-    };
-
-    const res=await fetch(APP.gasUrl,{
-      method:'POST',
-      headers:{'Content-Type':'text/plain;charset=UTF-8'},
-      body:JSON.stringify(payload)
-    });
-    const data=await res.json();
-    if(!data.ok) throw new Error(data.error||'STT 변환에 실패했습니다.');
-
-    fill.style.width='80%'; label.textContent='③ 변환 결과를 불러오는 중...';
-    const text=(data.text||'').trim();
-    if(!text) throw new Error('변환된 텍스트가 없습니다.');
-
-    document.getElementById('audioTranscript').value=text;
-    document.getElementById('audioResultWrap').style.display='block';
-    fill.style.width='100%'; label.textContent='변환 완료 — 아래 결과를 확인해주세요.';
-    notice.innerHTML='✅ <b>음성 → 텍스트 변환이 완료되었습니다.</b> 아래 원문을 확인·수정한 뒤 분석 단계로 넘어가세요.';
-    notice.style.color='var(--green)';
-    setTimeout(()=>{prog.style.display='none';},900);
-    showToast('음성을 텍스트로 변환했습니다. 결과를 확인해주세요.');
-  } catch(e) {
-    prog.style.display='none';
-    notice.innerHTML='❌ <b>자동 STT 변환에 실패했습니다.</b> '+(e.message||'알 수 없는 오류')+'<br>STT 결과가 이미 있다면 아래에 붙여넣어 계속 진행할 수 있습니다.';
-    notice.style.color='var(--red)';
-    console.error('audio transcription error',e);
-    showToast('STT 변환에 실패했습니다.');
-  } finally {
-    btn.disabled=false;
-    btn.style.opacity='1';
-  }
-}
-
-function useManualAudioTranscript() {
-  const src=document.getElementById('audioManualTranscript');
-  const text=src?.value.trim()||'';
-  if(!text){showToast('붙여넣을 텍스트가 없습니다');return;}
-  document.getElementById('audioTranscript').value=text;
-  document.getElementById('audioResultWrap').style.display='block';
-  document.getElementById('audioResultWrap').scrollIntoView({behavior:'smooth',block:'nearest'});
-  showToast('변환 결과로 확인할 수 있습니다. 아래 원문을 검토해주세요.');
-}
-
-function useAudioTranscript() {
-  const text=document.getElementById('audioTranscript').value.trim();
-  if(!text){showToast('변환된 내용이 없습니다');return;}
-  document.getElementById('pasteArea').value=text;
-  switchRecTab(1);
-  showToast('직접 입력 탭으로 이동했습니다. 상담 내용 분석하기를 눌러주세요.');
-}
-
-function setSTTStatus(msg, isError=false) {
-  const el=document.getElementById('sttStatus');
-  if(el) {
-    el.textContent='상태: '+msg;
-    el.style.color=isError?'var(--red)':'var(--ink-light)';
-  }
-}
-function toggleSTT() {
-  if(!APP.sttOn) startSTT(); else stopSTT();
-}
-function startSTT() {
-  const SR = window.SpeechRecognition||window.webkitSpeechRecognition;
-  if(!SR){
-    setSTTStatus('이 브라우저에서 실시간 음성 인식을 지원하지 않습니다.', true);
-    showToast('실시간 STT를 지원하지 않습니다. 직접 입력 또는 오디오 파일을 이용하세요.');
-    return;
-  }
-  if(APP.sttOn) return;
-
-  APP.sttRec = new SR();
-  APP.sttRec.lang='ko-KR';
-  APP.sttRec.continuous=true;
-  APP.sttRec.interimResults=true;
-  APP.sttRec.maxAlternatives=1;
-
-  const box=document.getElementById('sttBox');
-  APP.sttFinal='';
-  APP.sttRestartTimer=null;
-
-  APP.sttRec.onstart=()=>{
-    setSTTStatus('마이크 인식 중 — 말씀해 주세요.');
-  };
-
-  APP.sttRec.onresult=e=>{
-    let interim='';
-    for(let i=e.resultIndex;i<e.results.length;i++){
-      const text=(e.results[i][0]?.transcript||'').trim();
-      if(e.results[i].isFinal && text){
-        APP.sttFinal += text + ' ';
-      } else if(text){
-        interim += text;
-      }
-    }
-    const safeFinal = APP.sttFinal
-      .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-    const safeInterim = interim
-      .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
-    box.innerHTML=`<span>${safeFinal}</span><span class="stt-interim">${safeInterim}</span>`;
-    box.scrollTop=box.scrollHeight;
-  };
-
-  APP.sttRec.onerror=e=>{
-    const code=e?.error||'unknown';
-    if(code==='not-allowed'||code==='service-not-allowed'){
-      APP.sttOn=false;
-      setSTTStatus('마이크 권한이 허용되지 않았습니다. 브라우저 주소창의 마이크 권한을 확인해 주세요.', true);
-      showToast('마이크 권한을 허용해 주세요.');
-      updateSTTButton(false);
-      return;
-    }
-    if(code==='no-speech'){
-      setSTTStatus('음성이 감지되지 않았습니다. 계속 말씀해 주세요.');
-      return;
-    }
-    if(code==='audio-capture'){
-      APP.sttOn=false;
-      setSTTStatus('마이크를 사용할 수 없습니다.', true);
-      showToast('마이크를 확인해 주세요.');
-      updateSTTButton(false);
-      return;
-    }
-    setSTTStatus('음성 인식 일시 오류 — 다시 연결하는 중…', true);
-  };
-
-  APP.sttRec.onend=()=>{
-    if(APP.sttOn){
-      clearTimeout(APP.sttRestartTimer);
-      APP.sttRestartTimer=setTimeout(()=>{
-        if(APP.sttOn){
-          try { APP.sttRec.start(); } catch(e) {}
-        }
-      },250);
-    } else {
-      setSTTStatus('전사 종료');
-    }
-  };
-
-  APP.sttOn=true;
-  APP.sttSec=0;
-  updateSTTButton(true);
-  document.getElementById('sttTimer').style.display='inline';
-  clearInterval(APP.sttInt);
-  APP.sttInt=setInterval(()=>{
-    APP.sttSec++;
-    const m=String(Math.floor(APP.sttSec/60)).padStart(2,'0');
-    const s=String(APP.sttSec%60).padStart(2,'0');
-    document.getElementById('sttTimer').textContent=m+':'+s;
-  },1000);
-
-  try {
-    APP.sttRec.start();
-  } catch(e) {
-    APP.sttOn=false;
-    clearInterval(APP.sttInt);
-    updateSTTButton(false);
-    setSTTStatus('마이크 시작에 실패했습니다.', true);
-    showToast('마이크를 시작할 수 없습니다.');
-  }
-}
-function updateSTTButton(on) {
-  const btn=document.getElementById('sttBtn');
-  if(!btn) return;
-  if(on){
-    btn.textContent='■ 녹음 중지';
-    btn.className='rec-btn stop recording';
-  } else {
-    btn.textContent='● 녹음 시작';
-    btn.className='rec-btn start';
-    document.getElementById('sttTimer').style.display='none';
-  }
-}
-function stopSTT() {
-  APP.sttOn=false;
-  clearTimeout(APP.sttRestartTimer);
-  clearInterval(APP.sttInt);
-  if(APP.sttRec){
-    try { APP.sttRec.stop(); } catch(e) {}
-  }
-  updateSTTButton(false);
-
-  if(APP.sttFinal.trim()){
-    document.getElementById('pasteArea').value=APP.sttFinal.trim();
-    switchRecTab(1);
-    setSTTStatus('전사 완료 — 직접 입력 탭에서 내용을 확인하세요.');
-    showToast('STT 완료 — 전사 내용을 확인하세요.');
-  } else {
-    setSTTStatus('전사된 내용이 없습니다.');
-  }
-}
-function clearSTT() {
-  APP.sttOn=false;
-  clearTimeout(APP.sttRestartTimer);
-  clearInterval(APP.sttInt);
-  if(APP.sttRec){ try { APP.sttRec.abort(); } catch(e) {} }
-  APP.sttFinal='';
-  updateSTTButton(false);
-  document.getElementById('sttBox').innerHTML='<span style="color:var(--ink-faint);font-size:13px;">마이크 권한을 허용한 뒤 녹음 시작을 눌러 주세요.</span>';
-  setSTTStatus('대기 중');
-}
-
 // ── 자동 요약 (규칙 기반) ──
 // 브라우저에서 안전하게 동작하는 로컬 요약. 학생 개인정보를 외부 API로 전송하지 않습니다.
 // 필요 시 GAS 프록시를 통해 Claude API를 연동할 수 있도록 인터페이스는 유지합니다.
 async function runAnalysis() {
-  const transcript = (document.getElementById('pasteArea')?.value || APP.sttFinal || '').trim();
+  const transcript = (document.getElementById('pasteArea')?.value || '').trim();
   if(!transcript){showToast('면담 내용을 먼저 입력해주세요');return;}
   if(!APP.currentStudent){showToast('학생을 먼저 선택해주세요');return;}
 
@@ -8044,7 +7643,7 @@ async function saveInterviewRecord(){
   const s=STUDENTS[name];
   if(!name || !s){ showToast('학생을 먼저 선택해주세요'); return; }
 
-  const transcript=(document.getElementById('pasteArea')?.value||APP.sttFinal||'').trim();
+  const transcript=(document.getElementById('pasteArea')?.value||'').trim();
   if(!transcript){ showToast('면담 내용을 먼저 입력해주세요'); return; }
 
   const studentId=String(s.dbMeta?.student_id||'').trim();
@@ -8109,7 +7708,7 @@ async function saveInterviewResult() {
   const name=APP.currentStudent;
   const s=STUDENTS[name];
   const summary=document.getElementById('aiSummary')?.textContent||'';
-  const transcript=(document.getElementById('pasteArea')?.value||APP.sttFinal||'').trim();
+  const transcript=(document.getElementById('pasteArea')?.value||'').trim();
   const studentId=String(s?.dbMeta?.student_id||'').trim();
   if(!name || !s || !transcript){ showToast('학생과 면담 내용을 확인해주세요'); return; }
   if(!studentId){ showToast('학생 ID가 없습니다. DB를 다시 불러와주세요.'); return; }
@@ -8523,7 +8122,7 @@ async function loadSheetStats() {
 
 // ── 데이터 삭제 3단계 세분화 ──────────────────────────────
 // STUDENT_KEYS: 학생 관련 데이터 키 (설정과 분리)
-const STUDENT_STORAGE_KEYS = ['roster', 'students', 'STUDENTS', 'preInterviewData', 'sttFinal', 'gasOutbox'];
+const STUDENT_STORAGE_KEYS = ['roster', 'students', 'STUDENTS', 'preInterviewData', 'gasOutbox'];
 // SETTINGS_KEYS: 설정 관련 데이터 키
 const SETTINGS_STORAGE_KEYS = ['gasUrl', 'teacherName', 'classInfo', 'schoolYear',
   'driveFileId', 'appPassword', 'maskNames', 'pvTone'];
