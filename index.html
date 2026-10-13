@@ -7298,23 +7298,6 @@ function addQToGuide(q) {
   showToast('면담 가이드 3단계에 추가됐습니다 ✓');
 }
 
-function saveQDesign() {
-  const memo = document.getElementById('qDesignMemo').value;
-  const saved = JSON.parse(localStorage.getItem('qDesign_'+APP.currentStudent)||'{}');
-  saved.memo = memo;
-  localStorage.setItem('qDesign_'+APP.currentStudent, JSON.stringify(saved));
-  // 메모를 면담 가이드 커스텀 질문에도 반영
-  if(memo.trim()) {
-    const lines = memo.split('\n').filter(l=>l.trim());
-    lines.forEach(line => {
-      if(line.trim() && !APP.stepQs[2].find(q=>q.text===line.trim())) {
-        APP.stepQs[2].push({text:line.trim(), type:'cu'});
-      }
-    });
-  }
-  showToast('저장됐습니다 ✓ 면담 가이드에 반영됩니다');
-}
-
 function openStudentExpressionPopup(){
   const s=STUDENTS[APP.currentStudent];
   const body=document.getElementById('studentExpressionPopupBody');
