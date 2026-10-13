@@ -968,8 +968,21 @@ body.monitor-mode .pv-watermark { display:none; }
 </div>
 
 <!-- ══════════ PAGE: 대시보드 ══════════ -->
+<div id="demoBar" style="display:none;position:fixed;top:0;left:0;right:0;z-index:3000;background:#7a4a1c;color:#fff;
+  font-size:13px;padding:8px 14px;align-items:center;justify-content:center;gap:12px;font-family:'Noto Sans KR',sans-serif;">
+  <span>🧪 <b>체험 모드</b> · 가상 학생입니다. 아무것도 저장되지 않습니다.</span>
+  <button onclick="exitDemoMode()" style="background:#fff;color:#7a4a1c;border:none;border-radius:12px;padding:3px 12px;font-size:12px;cursor:pointer;">체험 끝내기</button>
+</div>
 <div class="page active" id="pgDash">
 <div class="dash-container">
+  <div id="demoEntry" style="display:none;background:var(--accent-pale);border:1px solid var(--accent-soft);border-radius:14px;padding:18px 22px;margin-bottom:14px;">
+    <div style="font-family:'Nanum Myeongjo',serif;font-size:16px;font-weight:700;margin-bottom:6px;">처음 오셨나요?</div>
+    <div style="font-size:13px;color:var(--ink-light);line-height:1.9;margin-bottom:10px;">
+      가상 학생 12명으로 설문 → 면담 준비 → 기록이 어떻게 이어지는지 먼저 살펴볼 수 있습니다.
+      체험 중에는 <b>아무것도 저장되지 않고</b>, 끝내면 원래 화면으로 돌아옵니다.
+    </div>
+    <button onclick="startDemoMode()" style="padding:9px 18px;background:var(--accent);color:#fff;border:none;border-radius:10px;font-size:13px;font-family:'Noto Sans KR',sans-serif;font-weight:700;cursor:pointer;">🧪 가상 학생으로 체험해 보기</button>
+  </div>
 
   <!-- 오늘의 문장: 앱을 열 때마다 마음을 고르는 한 줄 -->
   <div id="todayQuote" style="background:var(--ink);color:white;border-radius:14px;padding:18px 22px;margin-bottom:14px;position:relative;">
@@ -3716,6 +3729,7 @@ body.monitor-mode .pv-watermark { display:none; }
           <li><b>학급 정보 입력</b> — 학년·반 (예: 2학년 3반)</li>
           <li><b>학년도 입력</b> — 2026</li>
           <li><b>구글 시트 연결</b> — 아래 STEP 2 참조 (선택사항이지만 권장)</li>
+          <li><b>먼저 살펴보고 싶다면</b> — 학생이 등록되기 전 대시보드의 <b>🧪 가상 학생으로 체험해 보기</b>를 누르세요. 가상 학생 12명으로 설문·면담 준비·기록의 흐름을 볼 수 있고, <b>아무것도 저장되지 않습니다</b>. 위쪽 갈색 띠의 <b>체험 끝내기</b>를 누르면 원래 화면으로 돌아옵니다.</li>
         </ol>
         <div style="background:var(--yellow-pale);border-left:3px solid var(--yellow);
           border-radius:0 8px 8px 0;padding:10px 14px;margin-top:10px;font-size:12px;">
@@ -4232,7 +4246,7 @@ let STUDENTS = {};
 // 주소 뒤에 ?evidence=preview 를 붙여 열었을 때만 V11 데모의 가상 학생 4명을 채웁니다.
 // 실제 운영 화면(주소에 꼬리표 없음)에는 영향이 없습니다.
 const DEMO_STUDENTS_PREVIEW = {
-  '김서연':{num:'1',meta:'2학년 3반 1번',
+  '김서연':{num:'1',meta:'체험 · 가상 학생 1번',
     emotions:['활기찬','기대되는','편안한'],
     survey:{감정단어:'활기찬·기대되는·편안한',학습동기:'스스로 배우는 게 재미있어서',힘든것:'특별히 없다',
       학교느낌:'오고 싶은 곳',친구이름:'이수민',친구좋은점:'같이 있으면 편해서',뽐낼것:'그림 그리기',미래자아:'좋아하는 일을 하며 다른 사람에게 도움이 되는 사람',
@@ -4242,7 +4256,7 @@ const DEMO_STUDENTS_PREVIEW = {
     closing:'오늘 이야기한 것처럼 좋아하는 일을 계속 찾아보자.',
     records:[{type:'survey',date:'2026.09.30',title:'가상 설문',content:'감정: <b>활기찬·기대되는·편안한</b> / 동기: <b>스스로 배우는 게 재미있어서</b> / 뽐낼 것: <b>그림</b>'},
       {type:'interview',date:'2026.09.30',title:'가상 면담',content:'학급 활동에 자발적으로 참여함. 그림 활동을 좋아한다고 말함.'}]},
-  '박준호':{num:'2',meta:'2학년 3반 2번',
+  '박준호':{num:'2',meta:'체험 · 가상 학생 2번',
     emotions:['귀찮은','무기력한','그냥 그런'],
     survey:{감정단어:'귀찮은·무기력한·그냥 그런',학습동기:'해야 하니까 억지로',힘든것:'특별히 말하고 싶지 않다',
       학교느낌:'그냥 와야 하니까',친구이름:'없다',친구좋은점:'없다',뽐낼것:'없다',미래자아:'모르겠다',
@@ -4251,7 +4265,7 @@ const DEMO_STUDENTS_PREVIEW = {
     customQs:['요즘 하루 중 그래도 괜찮은 시간은 언제야?'],
     closing:'말하고 싶을 때 언제든 이야기할 수 있다는 것만 기억해줘.',
     records:[{type:'survey',date:'2026.09.30',title:'가상 설문',content:'감정: <b>귀찮은·무기력한·그냥 그런</b> / 동기: <b>억지로</b> / 뽐낼 것: <b>없다</b>'}]},
-  '이다은':{num:'3',meta:'2학년 3반 3번',
+  '이다은':{num:'3',meta:'체험 · 가상 학생 3번',
     emotions:['불안한','답답한','외로운'],
     survey:{감정단어:'불안한·답답한·외로운',학습동기:'친구와 같이 하면 다시 해요',힘든것:'친구 관계',
       학교느낌:'가끔 오기 싫다',친구이름:'없다',친구좋은점:'—',뽐낼것:'그림을 잘 그린다',미래자아:'다른 사람을 도와주는 사람이 되고 싶다',
@@ -4260,7 +4274,7 @@ const DEMO_STUDENTS_PREVIEW = {
     customQs:['그때 친구들이 어떻게 했어?'],
     closing:'이야기해줘서 고마워. 선생님이 서둘러 판단하지 않고 같이 살펴볼게.',
     records:[{type:'survey',date:'2026.09.30',title:'가상 설문',content:'감정: <b>불안한·답답한·외로운</b> / 힘든 것: <b>친구 관계</b> / 도움 요청: <b>친구 관계</b>'}]},
-  '최민준':{num:'4',meta:'2학년 3반 4번',
+  '최민준':{num:'4',meta:'체험 · 가상 학생 4번',
     emotions:['편안한','기대되는'],
     survey:{감정단어:'편안한·기대되는',학습동기:'성적이 오르면 기분이 좋아서',힘든것:'시험 기간이 조금 부담된다',
       학교느낌:'대체로 괜찮다',친구이름:'강지수',친구좋은점:'긍정적이다',뽐낼것:'사람들을 웃게 한다',미래자아:'좋아하는 일을 하며 사는 사람',
@@ -4269,7 +4283,7 @@ const DEMO_STUDENTS_PREVIEW = {
     customQs:['시험 전에 긴장이 심해질 때 어떤 느낌이 들어?'],
     closing:'시험 긴장 줄이는 방법을 같이 찾아보자.',
     records:[{type:'survey',date:'2026.09.30',title:'가상 설문',content:'감정: <b>편안한·기대되는</b> / 동기: <b>성적이 오르면 기분이 좋아서</b> / 도움 요청: <b>시험 긴장</b>'}]},
-  '한지우':{num:'5',meta:'2학년 3반 5번',
+  '한지우':{num:'5',meta:'체험 · 가상 학생 5번',
     emotions:['매우 힘든','절망적인'],
     survey:{감정단어:'절망적인·너무 힘든',학습동기:'모르겠다',힘든것:'요즘 너무 힘들고 죽고 싶다는 생각이 들어요',
       학교느낌:'학교에 오는 것도 힘들어요',친구이름:'없다',친구좋은점:'—',뽐낼것:'없다',미래자아:'모르겠다',
@@ -4277,10 +4291,80 @@ const DEMO_STUDENTS_PREVIEW = {
     checks:['학생 표현에 안전 관련 신호가 있어 즉시 학교 안전 대응 절차 확인 필요'],
     customQs:[],
     closing:'지금은 혼자 두지 않고 안전을 먼저 확인하는 것이 중요해.',
-    records:[{type:'survey',date:'2026.09.30',title:'가상 설문',content:'감정: <b>절망적인·너무 힘든</b> / 힘든 것: <b>"죽고 싶다는 생각이 들어요"</b> / 도움 요청: <b>도와주세요</b>'}]}
+    records:[{type:'survey',date:'2026.09.30',title:'가상 설문',content:'감정: <b>절망적인·너무 힘든</b> / 힘든 것: <b>"죽고 싶다는 생각이 들어요"</b> / 도움 요청: <b>도와주세요</b>'}]},
+  "정우진":{num:'6',meta:'체험 · 가상 학생 6번',
+    emotions:["그냥 그런"],
+    survey:{감정단어:"그냥 그런",학습동기:"게임 시간을 얻으려고",힘든것:"특별히 없다",학교느낌:"그냥 그래",친구이름:"같이 게임하는 친구",친구좋은점:"말이 잘 통해서",뽐낼것:"게임 랭킹",미래자아:"모르겠다",담임바람:"없다",학습어려움:"없다",도움요청:"없다"},
+    checks:["말수가 적은 것이 성향인지 일시적인지 구분해 보기", "좋아하는 주제에서 말이 길어지는지 관찰"],
+    customQs:["요즘 하루 중에 제일 편한 시간은 언제야?"],
+    closing:"오늘 이야기해 줘서 고마워. 필요하면 언제든 말해 줘.",
+    records:[{type:"survey",date:"2026.09.30",title:"가상 설문",content:"감정: <b>그냥 그런</b> / 동기: <b>게임 시간을 얻으려고</b> / 뽐낼 것: <b>게임 랭킹</b>"},{type:"interview",date:"2026.10.06",title:"가상 면담",content:"질문에는 한두 마디로 답함. 게임 이야기를 꺼내자 말이 길어졌고 표정이 풀림."},{type:"observation",date:"2026.10.08",title:"가상 관찰",content:"쉬는 시간에 같은 친구와 조용히 어울림. 수업 중 눈을 맞추는 횟수는 적음."}]},
+  "오하준":{num:'7',meta:'체험 · 가상 학생 7번',
+    emotions:["초조한", "답답한"],
+    survey:{감정단어:"초조한·답답한",학습동기:"성적을 다시 올리고 싶어서",힘든것:"성적이 기대만큼 나오지 않았다",학교느낌:"요즘 괜히 짜증이 난다",친구이름:"김민수",친구좋은점:"같이 공부해서",뽐낼것:"운동",미래자아:"아직 잘 모르겠다",담임바람:"시험이 끝났으니 좀 기다려줬으면",학습어려움:"집중이 잘 안 됨",도움요청:"시험 후 공부 계획"},
+    checks:["3월 설문과 비교해 달라진 점 확인", "변화를 원인으로 단정하지 않고 구체적 상황을 먼저 묻기"],
+    customQs:["3월에 세웠던 목표와 지금을 비교하면 어때?"],
+    closing:"결과보다 지금 마음이 어떤지가 더 궁금했어.",
+    records:[{type:"survey",date:"2026.03.12",title:"가상 설문(1차·3월)",content:"감정: <b>활기찬·기대되는</b> / 올해 목표: <b>수학 성적 올리기</b>"},{type:"survey",date:"2026.09.30",title:"가상 설문(2차·중간 후)",content:"감정: <b>초조한·답답한</b> / 힘든 것: <b>성적이 기대만큼 나오지 않았다</b>"},{type:"observation",date:"2026.10.07",title:"가상 관찰",content:"수업 중 필기를 멈추는 모습이 잦아짐. 쉬는 시간에는 평소처럼 운동장에 나감."}]},
+  "서도윤":{num:'8',meta:'체험 · 가상 학생 8번',
+    emotions:["불안한", "답답한"],
+    survey:{감정단어:"불안한·답답한",학습동기:"친구랑 같이 하면 해요",힘든것:"반 친구가 일부러 나를 무시하는 것 같아요",학교느낌:"가끔 오기 싫다",친구이름:"없다",친구좋은점:"—",뽐낼것:"그림",미래자아:"디자이너",담임바람:"너무 크게 알리지 않았으면",학습어려움:"집중이 흐트러짐",도움요청:"친구 관계"},
+    checks:["갈등인지 반복되는 괴롭힘인지는 서둘러 판단하지 않기", "어떤 말·행동이 몇 번 있었는지 구체적으로 확인"],
+    customQs:["그때 어떤 말이나 행동이 있었는지 하나만 이야기해 줄래?"],
+    closing:"이야기해 줘서 고마워. 선생님이 서둘러 판단하지 않고 같이 살펴볼게.",
+    records:[{type:"survey",date:"2026.09.30",title:"가상 설문",content:"감정: <b>불안한·답답한</b> / 힘든 것: <b>반 친구가 일부러 나를 무시하는 것 같아요</b>"},{type:"interview",date:"2026.10.05",title:"가상 면담",content:"\"무시하는 것 같다\"는 학생의 해석. 상대의 구체적 행동은 아직 확인하지 않음. 반복 여부 추가 확인 필요."}]},
+  "강하린":{num:'9',meta:'체험 · 가상 학생 9번',
+    emotions:["초조한"],
+    survey:{감정단어:"초조한",학습동기:"잘해야 하니까",힘든것:"잠을 잘 못 자서 계속 피곤해요",학교느낌:"오후가 되면 힘들다",친구이름:"박소은",친구좋은점:"이해해줘서",뽐낼것:"꼼꼼함",미래자아:"의사",담임바람:"특별히 없다",학습어려움:"밤늦게까지 공부해서 낮에 졸림",도움요청:"없다"},
+    checks:["수면·식사 등 생활 영향은 면담에서 구체적으로 확인", "필요하면 보건교사와 협의할지 판단(진단하지 않음)"],
+    customQs:["하루 중 몸이 제일 힘든 시간은 언제야?"],
+    closing:"몸이 보내는 신호를 말해 줘서 고마워.",
+    records:[{type:"survey",date:"2026.09.30",title:"가상 설문",content:"감정: <b>초조한</b> / 몸 상태: <b>조금 힘들어</b> / 힘든 것: <b>잠을 잘 못 자서 계속 피곤해요</b>"},{type:"observation",date:"2026.10.06",title:"가상 관찰",content:"3교시 이후 엎드려 있는 모습이 반복됨. 점심은 거르지 않고 먹음."}]},
+  "윤재민":{num:'10',meta:'체험 · 가상 학생 10번',
+    emotions:["혼란스러운"],
+    survey:{감정단어:"혼란스러운",학습동기:"모르겠다",힘든것:"앞으로 뭘 해야 할지 모르겠다",학교느낌:"대체로 괜찮다",친구이름:"이도훈",친구좋은점:"편해서",뽐낼것:"손재주",미래자아:"아직 없다",담임바람:"선택을 강요하지 않았으면",학습어려움:"목표가 없어서 의욕이 안 남",도움요청:"진로"},
+    checks:["올해 목표가 \"없다\"는 답을 현재의 솔직한 상태로 받아 주기", "결정을 대신하지 않고 선택의 조건 함께 살펴보기"],
+    customQs:["요즘 해 보고 싶은 것 중 아주 작은 것 하나만 말해 볼래?"],
+    closing:"답이 없어도 괜찮아. 같이 천천히 찾아보자.",
+    records:[{type:"survey",date:"2026.03.12",title:"가상 설문(1차·3월)",content:"올해 목표: <b>없다</b> / 10년 후: <b>아직 없다</b>"},{type:"interview",date:"2026.10.09",title:"가상 면담",content:"손으로 만드는 활동에는 관심을 보였으나 진로와 연결하는 것은 부담스러워함."}]},
+  "배서진":{num:'11',meta:'체험 · 가상 학생 11번',
+    emotions:["복잡한"],
+    survey:{감정단어:"복잡한",학습동기:"그냥",힘든것:"말하기 어려워요",학교느낌:"학교가 집보다 낫다",친구이름:"없다",친구좋은점:"—",뽐낼것:"없다",미래자아:"독립하고 싶다",담임바람:"건드리지 않았으면 좋겠다",학습어려움:"집에서 공부가 잘 안 됨",도움요청:"없다"},
+    checks:["말하고 싶지 않은 것은 지금의 경계로 존중하기", "학생이 원할 때 이야기할 수 있다는 점만 전하고 관심은 이어 가기", "구체적 사정은 추측하지 않기"],
+    customQs:[],
+    closing:"말하고 싶을 때 언제든 이야기해도 돼. 기다릴게.",
+    records:[{type:"survey",date:"2026.09.30",title:"가상 설문",content:"감정: <b>복잡한</b> / 힘든 것: <b>말하기 어려워요</b> / 선생님께: <b>건드리지 않았으면 좋겠다</b>"},{type:"observation",date:"2026.10.07",title:"가상 관찰",content:"방과 후에도 교실에 오래 남아 있음. 먼저 말을 걸지는 않으나 인사에는 응답함."}]},
+  "임태오":{num:'12',meta:'체험 · 가상 학생 12번',
+    emotions:["그냥 그런"],
+    survey:{감정단어:"그냥 그런",학습동기:"칭찬받고 싶어서",힘든것:"시험 기간이 부담된다",학교느낌:"대체로 괜찮다",친구이름:"모두 괜찮다",친구좋은점:"잘 어울려서",뽐낼것:"반장 일을 맡아서 한다",미래자아:"선생님",담임바람:"그냥 잘하고 있다고 말해 줬으면",학습어려움:"쉬는 시간이 없음",도움요청:"없다"},
+    checks:["겉으로 잘 지내는 학생도 면담 대상에서 빼지 않기", "부담을 스스로 안고 있지 않은지 구체적으로 묻기"],
+    customQs:["요즘 해야 하는 일이 많아서 쉬는 시간이 있어?"],
+    closing:"네가 하는 일을 선생님이 보고 있어. 힘들면 말해 줘.",
+    records:[{type:"survey",date:"2026.09.30",title:"가상 설문",content:"감정: <b>그냥 그런</b> / 힘든 것: <b>시험 기간이 부담된다</b> / 선생님께: <b>그냥 잘하고 있다고 말해 줬으면</b>"},{type:"observation",date:"2026.10.08",title:"가상 관찰",content:"학급 일을 도맡아 함. 점심시간에도 서류를 정리하는 모습이 보임."}]}
 };
+// ── 체험 모드: 가상 학생으로 앱 사용법을 익히는 모드. 아무것도 저장·전송하지 않습니다. ──
+let DEMO_MODE = false;
+function startDemoMode(){
+  DEMO_MODE = true;
+  STUDENTS = Object.assign({}, DEMO_STUDENTS_PREVIEW);
+  APP.currentStudent = null;
+  updateDemoUI();
+  if(typeof renderDashboard==='function') renderDashboard();
+  if(typeof renderStudentNavMenu==='function') renderStudentNavMenu();
+  showToast('체험 모드입니다. 아무것도 저장되지 않습니다');
+}
+function exitDemoMode(){ location.href = location.pathname; }
+function updateDemoUI(){
+  const bar=document.getElementById('demoBar'); if(bar) bar.style.display = DEMO_MODE ? 'flex' : 'none';
+  const entry=document.getElementById('demoEntry');
+  if(entry) entry.style.display = (!DEMO_MODE && Object.keys(STUDENTS).length===0) ? 'block' : 'none';
+  document.body.style.paddingTop = DEMO_MODE ? '38px' : '';
+  const nv=document.querySelector('.nav'); if(nv) nv.style.top = DEMO_MODE ? '38px' : '';
+}
+function demoBlock(){ if(DEMO_MODE){ showToast('체험 모드에서는 저장하지 않습니다'); return true; } return false; }
 if(new URLSearchParams(location.search).get('evidence')==='preview'){
   STUDENTS = Object.assign({}, DEMO_STUDENTS_PREVIEW);
+  DEMO_MODE = true;
 }
 
 const STEP_TITLES = ['🌱 마음 열기','📋 설문 확인','🔍 깊이 탐색','✨ 강점 발견','🤝 마무리'];
@@ -6929,6 +7013,7 @@ function getStudentExpressionSummary(s){
 
 // ══════════════ 대시보드 ══════════════
 function renderDashboard() {
+  updateDemoUI();
   const all=Object.entries(STUDENTS);
   const done=all.filter(([,s])=>(s.records||[]).some(r=>r.type==='survey'));
   const pending=all.filter(([,s])=>(s.records||[]).every(r=>r.type!=='interview'));
@@ -7311,6 +7396,7 @@ function toggleTeacherObservationForm(force){
   el.style.display=show?'block':'none';
 }
 async function saveTeacherObservationFromRewind(){
+  if(demoBlock()) return;
   const s=STUDENTS[APP.currentStudent];
   const text=(document.getElementById('teacherObservationText')?.value||'').trim();
   if(!s||!APP.currentStudent){showToast('학생을 먼저 선택해주세요');return;}
@@ -7639,6 +7725,7 @@ function renderAIResult(r) {
 }
 
 async function saveInterviewRecord(){
+  if(demoBlock()) return;
   const name=APP.currentStudent;
   const s=STUDENTS[name];
   if(!name || !s){ showToast('학생을 먼저 선택해주세요'); return; }
@@ -7705,6 +7792,7 @@ async function saveInterviewRecord(){
 }
 
 async function saveInterviewResult() {
+  if(demoBlock()) return;
   const name=APP.currentStudent;
   const s=STUDENTS[name];
   const summary=document.getElementById('aiSummary')?.textContent||'';
@@ -8027,6 +8115,7 @@ function applyDbSnapshot(data){
   return Object.keys(next).length;
 }
 async function syncFromGoogleSheet(){
+  if(demoBlock()) return;
   const url=(APP.gasUrl||localStorage.getItem('gasUrl')||'').trim();
   const box=document.getElementById('dbSyncStatus');
   if(!url){ if(box) box.textContent='먼저 Apps Script 웹앱 URL을 저장해주세요.'; return; }
@@ -8619,6 +8708,7 @@ const PI_QUESTIONS = {
 };
 
 async function genPreReqLink(role) {
+  if(demoBlock()) return;
   if(!APP.currentStudent){showToast('학생을 먼저 선택해주세요');return;}
   if(!APP.gasUrl){showToast('개인 링크는 먼저 Google Sheets 연동을 설정해주세요');return;}
   const box = document.getElementById('preReqLinkBox');
@@ -8706,6 +8796,7 @@ async function submitPreInterview(role, student, token) {
 }
 
 async function loadPreReq() {
+  if(demoBlock()) return;
   if(!APP.currentStudent){showToast('학생을 먼저 선택해주세요');return;}
   if(!APP.gasUrl){showToast('설정 탭에서 구글 시트를 먼저 연결해주세요');return;}
   const box = document.getElementById('preReqList');
@@ -8754,6 +8845,7 @@ function outboxSummary(){
   }catch(e){ return []; }
 }
 async function saveToSheet(type, data){
+  if(DEMO_MODE){ return {ok:false, reason:'demo'}; }
   if(!APP.gasUrl){
     _pushOutbox(type, data);
     return {ok:false, reason:'no-url'};
