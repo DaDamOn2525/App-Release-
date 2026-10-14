@@ -5350,7 +5350,7 @@ const SV_DEFAULTS = {
         locked:true, purpose:'감정 기준선(baseline). Barrett의 감정 입자성 이론 기반. 이후 차수와 비교해 감정 변화를 추적하는 종단 비교의 시작점이 됩니다. 대시보드 감정 분포와 위험군 자동 분류의 핵심 입력.'},
       {id:'q2',type:'choice',text:'요즘 학교 오는 게 어떤가요?',options:['기대되고 좋아','그냥 그래','가끔 싫을 때도 있어','솔직히 오기 싫어','모르겠어'],
         locked:true, purpose:'학교 소속감 · 등교 거부 조기 감지. 부적응 신호는 이 문항에서 가장 먼저 나타나는 경향이 있습니다. "솔직히 오기 싫어" 응답은 우선 관찰 대상.'},
-      {id:'q3',type:'choice',text:'지금 가장 힘든 것이 있다면?',options:['학업·성적','친구 관계','가족 문제','몸·마음 건강','특별히 없다','말하기 어렵다'],
+      {id:'q3',type:'choice',multi:true,text:'지금 가장 힘든 것이 있다면?',options:['학업·성적','친구 관계','가족 문제','몸·마음 건강','특별히 없다','말하기 어렵다'],
         locked:true, purpose:'핵심 스트레서 카테고리 파악. "가족 문제" 응답은 ACE 카드 대응 자원, "말하기 어렵다"는 회피 표현으로 위험군 자동 분류에 반영. 담임의 자원 배분 기준.'},
       {id:'q4',type:'text',text:'공부하기 싫을 때 나를 다시 하게 만드는 것은?',placeholder:'없으면 "없다"고 써도 됩니다.',
         purpose:'자기결정성 이론(Ryan & Deci) 관점의 동기 유형 탐색. 필수는 아니지만 담임의 개입 방향에 도움.'},
@@ -5364,7 +5364,7 @@ const SV_DEFAULTS = {
         purpose:'또래·대인관계 영역의 기본 탐색(위클래스 제안). 예/아니오로 가볍게 답할 수 있습니다. "없어"를 위험 신호로 확정하지 말고, 상담에서 어떤 관계를 원하는지 먼저 물어보세요.'},
       {id:'q9',type:'text',text:'집에서 주로 무엇을 하며 시간을 보내요? 나만의 충전 방법이나 스트레스를 푸는 방법도 좋아요.',placeholder:'없으면 "없다"고 써도 됩니다.',
         purpose:'가정·생활 패턴과 내적·외적 자원 탐색(위클래스 제안). 학생이 스스로 쓰는 회복 방법을 알아두면 이후 상담의 자원이 됩니다.'},
-      {id:'q10',type:'choice',text:'가족 중에서 가장 편안한 사람은 누구예요?',options:['부모님','형제자매','조부모','그 외 가족','특별히 없다','말하고 싶지 않아'],
+      {id:'q10',type:'choice',multi:true,text:'가족 중에서 가장 편안한 사람은 누구예요?',options:['부모님','형제자매','조부모','그 외 가족','특별히 없다','말하고 싶지 않아'],
         purpose:'가정 영역에서의 지지 대상 탐색(위클래스 제안). 가족 구성은 학생마다 다릅니다. "특별히 없다"나 "말하고 싶지 않아"는 지금의 경계로만 받아들이고, 학생이 원할 때 천천히 이야기하세요.'},
       {id:'q11',type:'choice',text:'지금 나의 건강 상태는 어때요?',options:['아주 좋아','보통이야','조금 힘들어','많이 힘들어'],
         purpose:'신체 상태 탐색(위클래스 제안). 응답만으로 진단하지 않고, 상담에서 구체적으로 확인합니다. 보건교사와의 협의가 필요한지 판단하는 출발점입니다.'},
@@ -5385,7 +5385,7 @@ const SV_DEFAULTS = {
     qs:[
       {id:'q1',type:'weather',text:'지금 내 마음을 날씨로 표현한다면?',options:[{icon:'☀️',label:'맑음'},{icon:'⛅',label:'흐림'},{icon:'🌧',label:'비'},{icon:'⛈',label:'폭풍'},{icon:'🌫',label:'안개'}],
         locked:true, purpose:'감정 종단 비교. 1차 대비 시험 국면에서의 정서 변화를 감지. 대시보드 감정 분포와 위험군 판정의 재계산 시점.'},
-      {id:'q2',type:'choice',text:'이번 시험 중 제일 걱정되는 것은?',options:['특정 과목 성적','공부 방법 모름','집중이 안 됨','시간 부족','특별히 없다'],
+      {id:'q2',type:'choice',multi:true,text:'이번 시험 중 제일 걱정되는 것은?',options:['특정 과목 성적','공부 방법 모름','집중이 안 됨','시간 부족','특별히 없다'],
         locked:true, purpose:'시험 불안의 원인 유형 감별. "공부 방법 모름"은 스킬 부족, "집중이 안 됨"은 심리적 소진 가능성 — 개입 방향이 전혀 다릅니다.'},
       {id:'q3',type:'star',text:'지금까지 준비한 것, 스스로 몇 점?',sub:'별점으로 표현해주세요 (1~5점)',
         purpose:'자기 평가·자기 효능감의 참고 지표. 필수는 아니지만 상담에서 대화 물꼬로 유용.'},
@@ -5406,7 +5406,7 @@ const SV_DEFAULTS = {
     qs:[
       {id:'q1',type:'slider',text:'이번 시험, 스스로 점수를 준다면?',sub:'노력 대비 만족도를 표시해주세요.',min:0,max:100,step:5,unit:'점',
         locked:true, purpose:'노력 대비 자기 평가. Dweck 마인드셋과 귀인 양식의 관찰 지표. 점수가 실제 성적과 크게 다르면 자기 인식 조정이 필요합니다.'},
-      {id:'q2',type:'choice',text:'예상보다 잘 된 것이 있다면?',options:['특정 과목','공부 방법','집중력','마음 관리','특별히 없다','생각보다 다 힘들었다'],
+      {id:'q2',type:'choice',multi:true,text:'예상보다 잘 된 것이 있다면?',options:['특정 과목','공부 방법','집중력','마음 관리','특별히 없다','생각보다 다 힘들었다'],
         purpose:'긍정 경험 발견. 필수는 아니지만 자기 효능감 강화의 실마리.'},
       {id:'q3',type:'text',text:'가장 아쉬운 점이 있다면?',placeholder:'솔직하게...',
         locked:true, purpose:'자기 반성·메타인지 · 마인드셋 유형 판별의 핵심 문항. "나는 원래 이 과목이 약해"(고정) vs "계획과 실천의 격차가 컸어"(성장+메타인지) — 상담 방향이 갈립니다. 상담의 기초 → "고정 vs 성장 마인드셋 식별" 카드 참고.'},
@@ -5425,7 +5425,7 @@ const SV_DEFAULTS = {
     qs:[
       {id:'q1',type:'slider',text:'3월에 세웠던 목표, 얼마나 이뤄졌나요?',sub:'0이라도 괜찮아요.',min:0,max:100,step:10,unit:'%',
         locked:true, purpose:'1차 목표 대비 자기 평가. 자기결정성 이론(Ryan & Deci)의 유능감 측정 지표. 0% 응답도 진솔한 자기 관찰이므로 낮은 점수를 부정적으로 해석하지 마세요.'},
-      {id:'q2',type:'choice',text:'이번 학기 나를 가장 힘들게 한 것은?',options:['학업 부담','친구 관계','가족 문제','몸·마음 건강','특별히 없었다','말하기 어렵다'],
+      {id:'q2',type:'choice',multi:true,text:'이번 학기 나를 가장 힘들게 한 것은?',options:['학업 부담','친구 관계','가족 문제','몸·마음 건강','특별히 없었다','말하기 어렵다'],
         locked:true, purpose:'1차 q3(3월 힘든 것) 대비 스트레서 변화 추적. 같은 카테고리가 반복되면 미해결 이슈, 카테고리가 바뀌면 새 상황 발생. "말하기 어렵다"의 지속은 위험군 재판정의 근거.'},
       {id:'q3',type:'text',text:'이번 학기 내가 가장 잘한 것 하나를 꼽는다면?',placeholder:'공부 아니어도 좋아요...',
         locked:true, purpose:'강점 유지·확장 확인. 1차 q5의 강점이 유지되는지, 새 강점이 발견되었는지가 학기의 성장 지표.'},
@@ -5448,7 +5448,7 @@ const SV_DEFAULTS = {
         locked:true, purpose:'자서전적 기억(autobiographical memory)의 조직화. 청소년기 정체성 형성의 핵심 재료. 이 순간을 언어화하는 것 자체가 자기 이해의 진전입니다.'},
       {id:'q3',type:'text',text:'이번 학기 새로 알게 된 나의 모습이 있다면?',placeholder:'작은 발견도 좋아요...',
         locked:true, purpose:'Campbell 자기 개념 명확성 발달의 핵심 지표. 1차 q6(10년 후 자아)과 함께 종단 비교의 두 축. 3차 학기 마무리에서 이 답이 구체화되면 유의미한 성장.'},
-      {id:'q4',type:'choice',text:'학교생활 중 가장 즐거웠던 시간은?',options:['친구와의 시간','수업 시간','동아리·행사','쉬는 시간','특별히 없었다'],
+      {id:'q4',type:'choice',multi:true,text:'학교생활 중 가장 즐거웠던 시간은?',options:['친구와의 시간','수업 시간','동아리·행사','쉬는 시간','특별히 없었다'],
         purpose:'긍정 경험의 원천 파악. 필수는 아니지만 학급 운영에 참고.'},
       {id:'q5',type:'text',text:'2학기에 달리 해보고 싶은 것이 있다면?',placeholder:'어떤 것이든...',
         locked:true, purpose:'자기결정성 이론의 자율성(autonomy) 지표. 학생 스스로 다음 학기를 설계하는 능력의 관찰점.'},
@@ -6102,6 +6102,18 @@ function buildSSQ(q, idx) {
           <div style="font-size:10px;color:var(--ink-light);margin-top:3px;">${o.label}</div>
         </div>`).join('')}
     </div>`;
+  } else if(q.type==='choice'&&q.multi&&q.options) {
+    body=`<div style="display:flex;flex-direction:column;gap:7px;" data-multi="${q.id}">
+      ${q.options.map((o,i)=>`
+        <div onclick="ssMulti('${q.id}',${i},this)"
+          style="background:var(--bg);border:1.5px solid var(--border);border-radius:10px;
+            padding:11px 14px;cursor:pointer;transition:all 0.2s;display:flex;
+            align-items:center;gap:10px;font-size:14px;">
+          <div class="ss-box" style="width:20px;height:20px;border-radius:5px;border:2px solid var(--border);
+            flex-shrink:0;display:flex;align-items:center;justify-content:center;color:white;font-size:13px;line-height:1;"></div>
+          ${o}
+        </div>`).join('')}
+    </div>`;
   } else if(q.type==='choice'&&q.options) {
     body=`<div style="display:flex;flex-direction:column;gap:7px;">
       ${q.options.map((o,i)=>`
@@ -6145,12 +6157,31 @@ function buildSSQ(q, idx) {
       <div style="font-size:10px;letter-spacing:2px;color:var(--accent);font-weight:700;margin-bottom:5px;">
         ${String(idx+1).padStart(2,'0')}
       </div>
-      <div style="font-size:15px;font-weight:700;color:var(--ink);line-height:1.5;margin-bottom:${q.sub?'4px':'12px'};">
+      <div style="font-size:15px;font-weight:700;color:var(--ink);line-height:1.5;margin-bottom:${(q.sub||q.multi)?'4px':'12px'};">
         ${q.text}
       </div>
-      ${q.sub?`<div style="font-size:12px;color:var(--ink-light);margin-bottom:10px;">${q.sub}</div>`:''}
+      ${(q.sub||q.multi)?`<div style="font-size:12px;color:var(--ink-light);margin-bottom:10px;">${q.sub||''}${q.multi?(q.sub?' ':'')+'여러 개 골라도 괜찮아요.':''}</div>`:''}
       ${body}
     </div>`;
+}
+
+// 여러 개 고르는 문항: '특별히 없다'·'말하기 어렵다'처럼 다른 선택과 함께 둘 수 없는 항목은 고르면 나머지를 해제합니다.
+const SS_EXCLUSIVE = /^(특별히 없|말하기 어렵|말하고 싶지|생각보다 다)/;
+function ssMulti(id, idx, el) {
+  const wrap = el.parentElement;
+  const q = (getSvData(new URLSearchParams(location.search).get('round')||'1')||{qs:[]}).qs.find(x=>x.id===id);
+  if(!q) return;
+  const opt = q.options[idx], exclusive = SS_EXCLUSIVE.test(opt);
+  const kids = [...wrap.children];
+  const isOn = e => e.dataset.on==='1';
+  const setOn = (e,on) => { e.dataset.on = on?'1':''; e.style.background = on?'var(--accent-pale)':'var(--bg)'; e.style.borderColor = on?'var(--accent)':'var(--border)';
+    const b=e.querySelector('.ss-box'); if(b){ b.style.background=on?'var(--accent)':'transparent'; b.style.borderColor=on?'var(--accent)':'var(--border)'; b.textContent=on?'✓':''; } };
+  const turningOn = !isOn(el);
+  if(turningOn && exclusive) kids.forEach(k=>setOn(k,k===el));
+  else { setOn(el,turningOn); if(turningOn) kids.forEach((k,i)=>{ if(k!==el && SS_EXCLUSIVE.test(q.options[i])) setOn(k,false); }); }
+  const picked = kids.map((k,i)=>isOn(k)?q.options[i]:null).filter(Boolean);
+  if(picked.length) ssAnswers[id]=picked.join(', '); else delete ssAnswers[id];
+  updateSSProgress();
 }
 
 function ssSelect(id, val, el) {
@@ -8747,8 +8778,10 @@ function applyDbSnapshot(data){
   localStorage.setItem('v11_db_sync_at',new Date().toISOString());
   return Object.keys(next).length;
 }
-async function syncFromGoogleSheet(){
-  if(demoBlock()) return;
+async function syncFromGoogleSheet(opts){
+  const silent = !!(opts && opts.silent);
+  if(!silent && demoBlock()) return;
+  if(silent && DEMO_MODE) return;
   const url=(APP.gasUrl||localStorage.getItem('gasUrl')||'').trim();
   const box=document.getElementById('dbSyncStatus');
   if(!url){ if(box) box.textContent='먼저 Apps Script 웹앱 URL을 저장해주세요.'; return; }
@@ -8778,10 +8811,12 @@ async function syncFromGoogleSheet(){
         + '</span>';
     }
     if(box) box.innerHTML=`✓ ${count}명 불러오기 완료 · ${new Date().toLocaleTimeString('ko-KR')} · GAS ${mt.version||'?'} · 원본 시트는 변경하지 않음${extra}`;
-    showToast(`실제 DB ${count}명 동기화 완료 ✓`);
+    { const gs=document.getElementById('gasStatus'); if(gs){ gs.className='gas-status ok'; gs.textContent='시트 연결됨 · '+new Date().toLocaleTimeString('ko-KR',{hour:'2-digit',minute:'2-digit'}); } }
+    window._lastAutoSync = Date.now();
+    if(!silent) showToast(`실제 DB ${count}명 동기화 완료 ✓`);
   }catch(e){
     if(box) box.innerHTML=`✗ 동기화 실패: ${e.message}`;
-    showToast('DB 동기화에 실패했습니다');
+    showToast(silent ? '시트에 연결하지 못해 지난 자료를 보여 드립니다' : 'DB 동기화에 실패했습니다');
   }
 }
 function restoreLastDbSnapshot(){
@@ -9554,6 +9589,15 @@ async function saveToSheet(type, data){
   }
 }
 
+// 다른 탭에 갔다가 돌아오면(5분 이상 지났을 때) 자동으로 최신 자료를 다시 불러옵니다.
+document.addEventListener('visibilitychange', function(){
+  if(document.visibilityState!=='visible') return;
+  if(new URLSearchParams(location.search).get('mode')) return;
+  if(!APP.gasUrl || !gasKey()) return;
+  if(Date.now()-(window._lastAutoSync||0) < 5*60*1000) return;
+  syncFromGoogleSheet({silent:true}).then(()=>{ const on=document.getElementById('pgStudent')?.classList.contains('active'); if(on && APP.currentStudent && STUDENTS[APP.currentStudent]) openStudent(APP.currentStudent); });
+});
+
 // 시트에서 최근 데이터를 가져와 방금 저장한 건이 반영됐는지 대조
 async function syncFromSheet(){
   if(!APP.gasUrl){showToast('구글 시트 URL을 먼저 설정해주세요');return;}
@@ -9600,7 +9644,10 @@ window.onload = () => {
   } else if (mode === 'preinterview') {
     initPreInterviewMode();
   } else {
+    // 시트가 연결돼 있으면 지난 자료를 바로 보여 주고, 최신 자료는 뒤에서 자동으로 불러옵니다(따로 누를 필요 없음).
+    if (APP.gasUrl) { try{ if(restoreLastDbSnapshot()>0){ renderStudentNavMenu(); } }catch(e){} }
     renderDashboard();
+    if (APP.gasUrl && gasKey()) setTimeout(()=>{ syncFromGoogleSheet({silent:true}); }, 300);
     // GAS URL이 있으면 축적 대시보드 자동 로드 (실패해도 조용히)
     if (APP.gasUrl) {
       setTimeout(() => { loadSheetStats().catch(() => {}); }, 500);
