@@ -7589,14 +7589,15 @@ function renderDashboard() {
   const pending=all.filter(([,s])=>(s.records||[]).every(r=>r.type!=='interview'));
   const reviewItems=all.filter(([,s])=>{
     const a=analyzeStudent(s);
-    return a.followups.length || a.safety.route!=='none';
+    return a.safety.route!=='none';   // 모든 학생에게 후속 확인 참고가 있으므로, 먼저 볼 학생은 안전 확인이 필요한 표현으로 한정
   });
+  const waiting=all.filter(([,s])=>!(s.records||[]).some(r=>r.type==='survey')).length;
 
   document.getElementById('sumTotal').textContent=all.length;
   document.getElementById('sumDone').textContent=done.length;
   document.getElementById('sumPending').textContent=pending.length;
   const sumDanger=document.getElementById('sumDanger');
-  if(sumDanger){sumDanger.textContent=reviewItems.length; const label=sumDanger.parentElement?.querySelector('.summary-label'); if(label) label.textContent='확인할 내용';}
+  if(sumDanger){sumDanger.textContent=reviewItems.length; const label=sumDanger.parentElement?.querySelector('.summary-label'); if(label) label.textContent='안전 확인';}
 
   const reviewEl=document.getElementById('dangerList');
   if(reviewEl){
@@ -7612,11 +7613,11 @@ function renderDashboard() {
           <div class="danger-name">${name}</div>
           <div style="font-size:11px;color:var(--ink-faint);margin-top:2px;">${safety?'안전 확인이 필요한 표현': '학생이 표현한 내용'}</div>
           <div title="${esc(ex.raw||cue)}" style="font-size:12px;color:var(--ink-light);line-height:1.55;">${esc(reason)}</div>
-          ${a.followups[0]?`<div class="danger-tags"><span class="dtag re">후속 확인 가능</span></div>`:''}
+          <div class="danger-tags"><span class="dtag re">안전 확인</span></div>
         </div>
         <div style="font-size:11px;color:var(--ink-faint);text-align:right;flex-shrink:0;">상담 ${(s.records||[]).filter(r=>r.type==='interview').length}회</div>
       </div>`;
-    }).join('') : '<div style="font-size:13px;color:var(--ink-faint);padding:10px 0;text-align:center;">현재 확인할 내용이 없습니다 🙂</div>';
+    }).join('') : `<div style="font-size:13px;color:var(--ink-faint);padding:10px 0;text-align:center;line-height:1.8;">지금 안전 확인이 필요한 표현은 없습니다 🙂<br><span style="font-size:11px;">학생별 후속 확인 참고는 학생 화면의 담임 브리핑에서 봅니다${waiting?` · 설문 응답을 기다리는 학생 ${waiting}명`:''}</span></div>`;
   }
 
   const emoCount={};
@@ -7636,7 +7637,8 @@ function renderDashboard() {
     const hasFollowup=a.followups.length;
     const safety=a.safety.route!=='none';
     const ex=getStudentExpressionSummary(s);
-    const next=safety?'안전 확인':hasFollowup?'후속 확인':'일상 관찰';
+    const noSv=!(s.records||[]).some(r=>r.type==='survey');
+    const next=safety?'안전 확인':noSv?'응답 대기':hasFollowup?'브리핑 보기':'일상 관찰';
     const nextColor=safety?'var(--red)':hasFollowup?'var(--accent)':'var(--ink-faint)';
     if(isMobile){
       return `<div onclick="openStudent('${esc(name)}')" style="display:flex;align-items:flex-start;gap:10px;padding:11px 12px;border-radius:10px;border:1.5px solid var(--border);background:var(--paper);margin-bottom:8px;cursor:pointer;">
