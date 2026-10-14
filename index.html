@@ -40,6 +40,8 @@ html,body{height:100%;background:var(--bg);font-family:'Noto Sans KR',sans-serif
 @media(max-width:760px){#navClassInput{display:none;} .nav-divider{display:none;} .gas-status{display:none;} .nav-btn{padding:4px 8px;font-size:11px;}}
 @media(max-width:1180px){.nav-tab .tab-label{display:none;} .nav-tab{padding:6px 11px;font-size:16px;} .nav-tab.active .tab-label{display:inline;font-size:13px;margin-left:4px;} #navStudent .tab-label{display:inline;max-width:70px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;vertical-align:bottom;font-size:12px;}}
 @media(max-width:560px){#navStudent .tab-label{display:none;} #navSyncBtn{font-size:0;padding:4px 10px;} #navSyncBtn::before{content:'↓';font-size:14px;} .nav-tabs{overflow-x:auto;flex-wrap:nowrap;scrollbar-width:none;} .nav-tab{flex:0 0 auto;padding:6px 9px;}}
+.btn-spin{display:inline-block;width:13px;height:13px;border:2px solid rgba(255,255,255,.45);border-top-color:#fff;border-radius:50%;animation:btnspin .7s linear infinite;vertical-align:-2px;}
+@keyframes btnspin{to{transform:rotate(360deg);}}
 /* 지난 기록 함께 보기 팝업 */
 #briefingRewindModal{display:none;position:fixed;inset:0;z-index:10050;background:rgba(0,0,0,.42);align-items:center;justify-content:center;padding:18px;}
 #briefingRewindModal.show{display:flex;}
@@ -1664,11 +1666,6 @@ body.monitor-mode .pv-watermark { display:none; }
           border:none;cursor:pointer;transition:all 0.2s;background:var(--bg);color:var(--ink-light);border-left:1px solid var(--border);">
         📁 엑셀/CSV 업로드
       </button>
-      <button class="field-tab" id="ftab2" onclick="switchFieldTab(2)"
-        style="flex:1;padding:9px;font-size:12px;font-family:'Noto Sans KR',sans-serif;
-          border:none;cursor:pointer;transition:all 0.2s;background:var(--bg);color:var(--ink-light);border-left:1px solid var(--border);">
-        📥 양식 내보내기
-      </button>
     </div>
 
     <!-- 탭 0: 한 명씩 -->
@@ -1713,24 +1710,11 @@ body.monitor-mode .pv-watermark { display:none; }
         <div style="font-size:13px;color:var(--ink-light);line-height:1.8;">
           <b style="color:var(--accent);">클릭</b>하거나 파일을 드래그하세요<br>
           .xlsx, .csv, .xls 지원<br>
-          <span style="font-size:11px;">나이스에서 받은 엑셀 파일을 그대로 올려도 됩니다 (번호·성명 열을 자동으로 찾습니다)</span>
+          <span style="font-size:11px;"><b>나이스에서 학급 명렬을 엑셀로 내려받아 그 파일을 그대로 올리면 됩니다.</b><br>번호·성명 열을 자동으로 찾고, 전출 등으로 빈 번호는 그대로 둡니다.</span>
         </div>
       </div>
       <input type="file" id="csvFile" accept=".csv,.xlsx,.xls" style="display:none;" onchange="handleCsvFile(event)">
       <div id="csvPreview" style="display:none;margin-top:10px;"></div>
-    </div>
-
-    <!-- 탭 2: 양식 내보내기 -->
-    <div id="fpanel2" style="display:none;">
-      <div style="border:1.5px solid var(--border);border-radius:10px;padding:18px;background:var(--bg);text-align:center;">
-        <div style="font-size:28px;margin-bottom:8px;">📥</div>
-        <div style="font-size:13px;color:var(--ink-light);line-height:1.9;margin-bottom:12px;">
-          나이스에서 받은 엑셀의 <b>번호·성명</b> 열을 복사해 양식에 붙여 넣고 저장한 뒤,<br>
-          <b>엑셀/CSV 업로드</b>에 올리면 한 번에 등록됩니다.<br>
-          <span style="font-size:11px;">번호는 학급 번호 그대로 두고, <b>전출 등으로 비는 번호는 이름 칸을 비워 두세요</b>(이름이 없는 줄은 건너뜁니다). 나이스 파일은 그대로 올려도 됩니다.</span>
-        </div>
-        <button onclick="downloadRosterTemplate()" style="padding:10px 22px;background:var(--accent);color:white;border:none;border-radius:8px;font-size:13px;font-family:'Noto Sans KR',sans-serif;cursor:pointer;">명렬 양식 내려받기 (.csv)</button>
-      </div>
     </div>
 
     <!-- 등록된 학생 목록 -->
@@ -3807,8 +3791,7 @@ body.monitor-mode .pv-watermark { display:none; }
               padding:4px 10px;font-size:11px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;">
             복사
           </button>
-          <pre id="gasCodeBlock" class="code-block" style="font-size:11px;white-space:pre-wrap;">
-/**
+          <pre id="gasCodeBlock" class="code-block" style="font-size:11px;white-space:pre-wrap;">/**
  * DAMIM — 담임 개인 서버 (Google Apps Script)  ·  V11.1 시트 구조용 재구성본
  * ------------------------------------------------------------------
  * 사용법
@@ -3826,7 +3809,7 @@ body.monitor-mode .pv-watermark { display:none; }
  *  - 위험 판정은 이 서버에서 하지 않습니다(앱의 안전 신호 안내가 담당).
  */
 
-var VERSION = 'V11.1-rebuild-5';
+var VERSION = 'V11.1-rebuild-6';
 var TZ = 'Asia/Seoul';
 // ★ 관리 키: 아래 따옴표 안을 본인만 아는 짧은 문구로 바꾸세요. 한글도 됩니다(예: '바람커피'). 앱 설정 탭의 '관리 키'에도 똑같이 입력합니다.
 //   띄어쓰기는 무시되니 붙여 쓰는 것이 편하고, 따옴표(')는 지우지 마세요.
@@ -3850,7 +3833,7 @@ HEADERS[TAB.responses] = ['response_id','student_id','survey_round','question_id
 HEADERS[TAB.counseling] = ['record_id','student_id','counseling_date','source_type','source_file_id','transcript_raw','speaker_segments','student_quotes','teacher_observations','teacher_interpretations','ai_suggestions','matched_rule_ids','matched_guidance_ids','support_action','student_request','followup_needed','safety_route','teacher_confirmed','created_at','analysis_version'];
 HEADERS[TAB.observation] = ['observation_id','student_id','date','context','direct_observation','student_statement','teacher_interpretation','support_action','student_response_to_support','next_check','related_record_id','teacher_confirmed'];
 HEADERS[TAB.links] = ['token','student_id','학생명','role','createdAt','active','last_access','notes'];
-HEADERS[TAB.preReq] = ['submittedAt','name','student_id','role','token','q1','q2','q3'];
+HEADERS[TAB.preReq] = ['submittedAt','name','student_id','role','token','q1','q2','q3','희망일자','희망시간','덧붙임'];
 HEADERS[TAB.journal] = ['date','name','recType','title','content','aiNote'];
 
 // 1차 설문(앱 문항 q1~q7)을 V11 질문 코드(Q01~Q07)로 잇는 표. 앱의 학생 상세 화면이 이 코드를 읽습니다.
@@ -3979,7 +3962,8 @@ function savePreReq_(d) {
   appendObj_(TAB.preReq, {
     submittedAt: d.submittedAt || new Date().toISOString(),
     name: link['학생명'], student_id: link.student_id, role: d.role || link.role,
-    token: d.token, q1: d.q1 || '', q2: d.q2 || '', q3: d.q3 || ''
+    token: d.token, q1: d.q1 || '', q2: d.q2 || '', q3: d.q3 || '',
+    '희망일자': d.prefDate || '', '희망시간': d.prefTime || '', '덧붙임': d.extra || ''
   });
 }
 
@@ -4153,6 +4137,12 @@ function headersOf_(sh) {
 function appendObj_(name, obj) {
   var sh = sheet_(name);
   var hs = headersOf_(sh);
+  // 예전에 만든 시트에 새 열이 없으면, 정해진 머리글 중 빠진 것을 오른쪽 끝에 덧붙입니다.
+  if (HEADERS[name]) {
+    HEADERS[name].forEach(function (h) {
+      if (hs.indexOf(h) &lt; 0) { sh.getRange(1, hs.length + 1).setValue(h); hs.push(h); }
+    });
+  }
   var row = hs.map(function (h) { var v = obj[h]; return (v === undefined || v === null) ? '' : v; });
   sh.appendRow(row);
 }
@@ -4193,7 +4183,8 @@ function todayIso_() { return Utilities.formatDate(new Date(), TZ, 'yyyy-MM-dd')
 
 function json_(obj) {
   return ContentService.createTextOutput(JSON.stringify(obj)).setMimeType(ContentService.MimeType.JSON);
-}</pre>
+}
+</pre>
         </div>
       </div>
     </div>
@@ -4208,8 +4199,7 @@ function json_(obj) {
         <b>세 가지 방법 중 하나 선택:</b>
         <ol style="margin-top:8px;">
           <li><b>한 명씩 입력</b> — 번호·이름·성별 직접 입력</li>
-          <li><b>양식 내보내기</b> — 번호·이름 양식을 내려받아 나이스 명렬을 붙여 넣고 저장</li>
-          <li><b>엑셀/CSV 업로드</b> — 나이스 명렬 파일(또는 채운 양식)을 올리면 한 번에 등록</li>
+                    <li><b>엑셀/CSV 업로드</b> — 나이스에서 받은 학급 명렬 엑셀을 그대로 올리면 한 번에 등록</li>
         </ol>
         <div style="background:var(--green-pale);border-left:3px solid var(--green);
           border-radius:0 8px 8px 0;padding:10px 14px;margin-top:10px;font-size:12px;">
@@ -5949,7 +5939,7 @@ function initStudentMode() {
   if(mode !== 'student') return;
 
   // 교사 UI 숨기기
-  document.querySelector('.nav').style.display='none';
+  document.querySelector('.nav').style.display='none'; const _bg=document.getElementById('v112DbBadge'); if(_bg) _bg.style.display='none';
   document.querySelectorAll('.page').forEach(p=>p.style.display='none');
   document.getElementById('studentSurveyMode').style.display='block';
 
@@ -5988,8 +5978,13 @@ async function setupStudentIdentity(params){
       const res = await fetch(`${gas}?type=resolvePersonalLink&token=${encodeURIComponent(token)}`);
       const d = await res.json();
       if(!d.ok || !d.student) throw new Error('invalid');
-      ssIdentity.token = token; ssIdentity.ok = true;
-      box.innerHTML = card(`<b>${String(d.student).replace(/[<>&]/g,'')}</b> 학생, 안녕하세요. 편하게 적어 주세요.`,'green');
+      ssIdentity.token = token; ssIdentity.ok = false;
+      const nm = String(d.student).replace(/[<>&]/g,''); const mk = nm.length<=2 ? nm[0]+'○' : nm[0]+'○'.repeat(nm.length-2)+nm[nm.length-1];
+      box.innerHTML = card(`<b>${mk}</b> 학생이 맞나요?
+        <div style="display:flex;gap:8px;margin-top:8px;">
+          <button onclick="ssConfirmToken()" style="padding:9px 16px;background:var(--green);color:white;border:0;border-radius:8px;font-weight:700;cursor:pointer;">맞아요</button>
+          <button onclick="ssDenyToken()" style="padding:9px 16px;background:var(--bg);border:1px solid var(--border);border-radius:8px;cursor:pointer;">아니에요</button>
+        </div><div id="ssTokRes" style="margin-top:8px;"></div>`);
       return;
     }catch(e){
       if(!cls){
@@ -6009,6 +6004,10 @@ async function setupStudentIdentity(params){
   }
   box.innerHTML = card('이 링크로는 누구의 응답인지 알 수 없어요. 선생님께 받은 링크로 다시 들어와 주세요.','red');
 }
+function ssConfirmToken(){ ssIdentity.ok=true; const o=document.getElementById('ssTokRes'); if(o) o.innerHTML='<b style="color:var(--green);">✓ 확인됐어요.</b> 편하게 적어 주세요.'; }
+function ssDenyToken(){ ssIdentity.ok=false; ssIdentity.token=''; const o=document.getElementById('ssTokRes'); if(o) o.innerHTML='<b style="color:var(--red);">다른 친구의 링크일 수 있어요.</b> 제출하지 말고, 선생님께 내 링크를 다시 받아 주세요.'; }
+let ssSending=false;
+function ssBusy(btn,on,label){ if(!btn) return; btn.disabled=on; btn.style.opacity=on?'.75':'1'; btn.style.cursor=on?'wait':'pointer'; if(on){ btn.dataset.t=btn.innerHTML; btn.innerHTML='<span class="btn-spin"></span> '+(label||'전송 중이에요…'); } else if(btn.dataset.t){ btn.innerHTML=btn.dataset.t; } }
 async function ssLookupNum(){
   const gas = APP.gasUrl, cls = ssIdentity.cls;
   const num = (document.getElementById('ssNumInput')?.value||'').trim();
@@ -6159,10 +6158,13 @@ function updateSSProgress() {
 async function submitStudentSurvey(round) {
   const data=getSvData(round);
   if(!ssIdentity.ok){
-    showToast('먼저 위에서 번호를 확인해 주세요');
+    showToast(ssIdentity.token||document.getElementById('ssTokRes') ? '먼저 위에서 이름이 맞는지 확인해 주세요' : '먼저 위에서 번호를 확인해 주세요');
     document.getElementById('ssIdBox')?.scrollIntoView({behavior:'smooth', block:'center'});
     return;
   }
+  if(ssSending) return; ssSending=true;
+  const sbtn=document.querySelector('#ssQContainer button[onclick^="submitStudentSurvey"]'); ssBusy(sbtn,true,'전송 중이에요… 잠시만요');
+  const t0=Date.now();
   const payload={round, submittedAt:new Date().toISOString(), ...ssAnswers};
   if(ssIdentity.token) payload.token = ssIdentity.token;
   else if(ssIdentity.num){ payload.cls = ssIdentity.cls; payload.num = ssIdentity.num; }
@@ -6170,8 +6172,9 @@ async function submitStudentSurvey(round) {
   const sent = await saveToSheet('survey',{...payload, type:'survey', name:'(학생)'+round+'차'});
   if(sent && sent.ok===false && sent.reason==='network'){
     showToast('전송에 실패했어요. 인터넷을 확인하고 다시 눌러 주세요');
-    return;
+    ssSending=false; ssBusy(sbtn,false); return;
   }
+  if(Date.now()-t0<700) await new Promise(r=>setTimeout(r,700-(Date.now()-t0)));
   // 완료 화면
   document.getElementById('ssQContainer').style.display='none';
   document.getElementById('ssDone').style.display='block';
@@ -7956,12 +7959,26 @@ function renderTeacherBriefing(){
   const snapshot=[
     ['감정',survey.감정단어],['힘든 것',survey.힘든것],['학교 느낌',survey.학교느낌]
   ].filter(x=>String(x[1]||'').trim());
+  const hasNegEmo=(s.emotions||[]).some(e=>EMOTION_MAP[e]==='neg');
+  const nothingHard=/^(없|딱히|특별히|괜찮|별로|아니)|없(다|어|음|습니다|어요)?[.!\s]*$/.test(String(survey.힘든것||'').trim());
+  const schoolPos=/(좋|기대|재미|즐|편안|행복|만족)/.test(String(survey.학교느낌||''));
+  const showGood=Object.keys(survey).length && !hasNegEmo && (nothingHard||schoolPos);
+  const proud=String(survey.뽐낼것||'').trim(), future=String(survey.미래자아||'').trim();
+  const goodCard=showGood?`<div class="card" style="margin-bottom:12px;background:var(--green-pale);border:1px solid var(--green);">
+      <div style="font-size:12px;font-weight:800;color:var(--green);letter-spacing:.6px;margin-bottom:8px;">🌱 잘 지내고 있다는 신호가 읽힙니다</div>
+      <div style="font-size:13px;line-height:1.85;color:var(--ink);">이번 응답에서 이 학생은 마음 날씨를 “${escText((s.emotions||[]).join('·')||'—')}”라고 적었습니다${schoolPos?'. 학교생활도 좋게 표현했습니다':''}${nothingHard?'. 힘든 점은 특별히 없다고 했습니다':''}.<br>
+      조용히 잘 지내는 학생은 담임의 시선이 가장 쉽게 비켜 가는 학생이기도 합니다. 문제가 없다는 이유로 이번 학기 내내 짧은 대화조차 없는 일이 생기지 않게, 가볍게 인정하는 한마디가 도움이 됩니다.</div>
+      <div style="margin-top:8px;font-size:12px;line-height:1.8;color:var(--ink);">
+        ${proud?`· “${escText(proud)}” — 학생이 자랑으로 꼽은 것을 알아본다고 말해 주기<br>`:''}${future?`· “${escText(future)}” — 바라는 모습을 응원하는 한마디<br>`:''}· 복도에서 이름을 부르며 “설문 잘 읽었어” 정도의 짧은 인사</div>
+      <div style="margin-top:8px;font-size:10px;color:var(--ink-faint);line-height:1.7;">긍정적인 응답만으로 학교생활 전체를 단정하지는 않습니다. 설문에서는 좋게 쓰고 싶은 마음이 작용할 수 있으니, 이후 관찰과 대화로 이어서 확인합니다.</div>
+    </div>`:'';
   box.innerHTML=`
     <div style="background:var(--accent-pale);border-left:4px solid var(--accent);border-radius:0 12px 12px 0;padding:14px 16px;margin-bottom:14px;">
       <div style="font-size:11px;color:var(--accent);font-weight:800;letter-spacing:1px;margin-bottom:5px;">TEACHER BRIEFING</div>
       <div style="font-size:18px;font-weight:800;color:var(--ink);line-height:1.55;">이 학생에게 지금 무엇을 한 번 더 살펴볼까요?</div>
       <div style="font-size:12px;color:var(--ink-light);margin-top:5px;line-height:1.7;">학생을 평가하거나 행동을 지시하지 않습니다. 담임이 필요할 때 한 번 더 살펴볼 수 있는 관점만 제공합니다.</div>
     </div>
+    ${goodCard}
     <div class="card" style="margin-bottom:12px;">
       <div style="font-size:12px;font-weight:800;color:var(--ink-light);letter-spacing:.6px;margin-bottom:8px;">① 단서 <span style="font-weight:500;color:var(--ink-faint);">· 학생이 쓴 그대로</span></div>
       ${cues.length?cues.map(x=>`<div style="background:var(--bg);border-radius:9px;padding:10px 12px;margin-bottom:7px;font-size:13px;line-height:1.75;color:var(--ink);">
@@ -8665,6 +8682,10 @@ function applyDbSnapshot(data){
       return (sid&&xid&&sid===xid)||(!sid&&nameOf(x)===name);
     }).forEach(x=>records.push({type:'observation',date:val(x,'observation_date','date','작성일'),title:'교사 관찰·지원',content:val(x,'observation_text','direct_observation','내용','support_action'),teacherNote:val(x,'teacher_interpretation','teacher_interpretation'),recordId:val(x,'observation_id')}));
 
+    if(Object.keys(survey).length){
+      const sd=matches.map(x=>String(val(x,'response_date','date','created_at')||'')).filter(Boolean).sort().pop()||'';
+      records.unshift({type:'survey',date:sd?String(sd).slice(0,10):'',title:'설문 응답',content:'<b>'+String(survey['감정단어']||'').replace(/[<>&]/g,'')+'</b>'});
+    }
     next[name]={
       num:String(val(r,'번호','student_no','학번')||''),
       meta:`${val(r,'학년','grade')} ${val(r,'반','class_name')} ${val(r,'번호','student_no')}번`,
@@ -8865,7 +8886,7 @@ function clearAllData() {
 function copySurveyLink(){navigator.clipboard.writeText('student_survey.html 파일을 배포하세요').then(()=>showToast('설문 파일 경로 복사됨 ✓'));}
 // ══════════════ 학생 명렬 ══════════════
 function switchFieldTab(i) {
-  [0,1,2].forEach(j => {
+  [0,1].forEach(j => {
     const btn = document.getElementById('ftab'+j);
     const panel = document.getElementById('fpanel'+j);
     const isActive = j===i;
@@ -8930,13 +8951,6 @@ function addOneStudent() {
   document.getElementById('newName').value='';
   showToast(`${name} 등록됐습니다 ✓`);
   renderDashboard();
-}
-function downloadRosterTemplate() {
-  const rows=[['번호','이름','성별']]; for(let i=1;i<=30;i++) rows.push([i,'','']);
-  const csv='﻿'+rows.map(r=>r.join(',')).join('\r\n');
-  const url=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8;'}));
-  const a=document.createElement('a'); a.href=url; a.download='학생명렬_양식.csv'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
-  showToast('양식을 내려받았습니다. 번호·이름을 채워 업로드하세요');
 }
 function decodeRosterBuffer(buf) {
   try { return new TextDecoder('utf-8',{fatal:true}).decode(buf).replace(/^﻿/,''); }
@@ -9300,6 +9314,13 @@ const PI_QUESTIONS = {
   ]
 };
 
+const piAnswers = {};
+function copyLinkFrom(btn){
+  const url = btn.getAttribute('data-url')||'';
+  const done=()=>showToast('개인 링크가 복사됐습니다 ✓');
+  const fb=()=>{ const t=document.createElement('textarea'); t.value=url; document.body.appendChild(t); t.select(); try{document.execCommand('copy'); done();}catch(e){showToast('복사하지 못했습니다. 주소를 길게 눌러 복사해 주세요');} t.remove(); };
+  if(navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(url).then(done,fb); else fb();
+}
 async function genPreReqLink(role) {
   if(demoBlock()) return;
   if(!APP.currentStudent){showToast('학생을 먼저 선택해주세요');return;}
@@ -9313,8 +9334,8 @@ async function genPreReqLink(role) {
     const url = `${location.origin}${location.pathname}?mode=preinterview&token=${encodeURIComponent(data.token)}&gas=${encodeURIComponent(APP.gasUrl)}`;
     box.innerHTML = `<div style="margin-bottom:6px;font-weight:700;color:var(--ink);">${role==='student'?'🧑‍🎓 학생용':'🌿 학부모용'} 개인 링크</div>
       <div style="font-size:12px;color:var(--ink-light);margin-bottom:7px;">${esc(APP.currentStudent)}에게만 전달하는 링크입니다.</div>
-      <div style="margin-bottom:8px;word-break:break-all;background:var(--bg);padding:8px;border-radius:7px;font-size:11px;">${esc(url)}</div>
-      <button onclick="navigator.clipboard.writeText(${JSON.stringify(url)}).then(()=>showToast('개인 링크가 복사됐습니다 ✓'))"
+      <div style="margin-bottom:8px;word-break:break-all;background:var(--bg);padding:8px;border-radius:7px;font-size:11px;user-select:all;">${esc(url)}</div>
+      <button data-url="${esc(url)}" onclick="copyLinkFrom(this)"
         style="padding:6px 12px;background:var(--accent);color:white;border:none;border-radius:6px;font-size:11px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;">📋 복사</button>`;
   }catch(e){ box.innerHTML='<div style="font-size:12px;color:var(--red);padding:8px 0;">개인 링크 생성 실패. GAS 배포 권한과 URL을 확인해주세요.</div>'; }
 }
@@ -9323,9 +9344,10 @@ async function initPreInterviewMode() {
   const params = new URLSearchParams(location.search);
   const gasUrl = params.get('gas') || '';
   const token = params.get('token') || '';
-  document.querySelector('.nav').style.display='none';
+  document.querySelector('.nav').style.display='none'; const _bg=document.getElementById('v112DbBadge'); if(_bg) _bg.style.display='none';
   document.querySelectorAll('.page').forEach(p=>p.style.display='none');
   document.getElementById('preInterviewMode').style.display='block';
+  if(gasUrl) APP.gasUrl = gasUrl;
   if(!token || !gasUrl){
     document.getElementById('piRoleBadge').textContent='안내';
     document.getElementById('piTitle').textContent='개인 링크가 필요합니다';
@@ -9352,6 +9374,7 @@ async function initPreInterviewMode() {
 }
 
 function renderPreInterviewForm(role, student, token) {
+  window._pi = {role, student, token};
   const qs = PI_QUESTIONS[role];
   const container = document.getElementById('piQContainer');
   container.innerHTML = qs.map((q,idx)=>`
@@ -9370,7 +9393,20 @@ function renderPreInterviewForm(role, student, token) {
           color:var(--ink);background:var(--bg);resize:none;outline:none;line-height:1.8;"
         placeholder="${q.ph||''}"></textarea>
     </div>`).join('') +
-    `<button onclick="submitPreInterview('${role}',${JSON.stringify(student)},${JSON.stringify(token||'')})"
+    `<div style="background:var(--paper);border:1.5px solid var(--border);border-radius:14px;padding:18px 16px;margin-bottom:12px;box-shadow:0 2px 8px var(--shadow);">
+      <div style="font-size:10px;letter-spacing:2px;color:var(--accent);font-weight:700;margin-bottom:5px;">04</div>
+      <div style="font-size:15px;font-weight:700;color:var(--ink);line-height:1.5;margin-bottom:4px;">상담을 원하는 날짜와 시간이 있나요?</div>
+      <div style="font-size:12px;color:var(--ink-light);margin-bottom:10px;">선택 사항입니다. 정해지지 않았다면 비워 두세요.</div>
+      <div style="display:flex;gap:8px;">
+        <input type="date" oninput="piAnswers.prefDate=this.value" style="flex:1;min-width:0;padding:10px;border:1.5px solid var(--border);border-radius:10px;font-size:14px;background:var(--bg);font-family:'Noto Sans KR',sans-serif;">
+        <input type="time" oninput="piAnswers.prefTime=this.value" style="flex:1;min-width:0;padding:10px;border:1.5px solid var(--border);border-radius:10px;font-size:14px;background:var(--bg);font-family:'Noto Sans KR',sans-serif;">
+      </div></div>
+    <div style="background:var(--paper);border:1.5px solid var(--border);border-radius:14px;padding:18px 16px;margin-bottom:12px;box-shadow:0 2px 8px var(--shadow);">
+      <div style="font-size:10px;letter-spacing:2px;color:var(--accent);font-weight:700;margin-bottom:5px;">05</div>
+      <div style="font-size:15px;font-weight:700;color:var(--ink);line-height:1.5;margin-bottom:4px;">덧붙이고 싶은 말이 있나요?</div>
+      <div style="font-size:12px;color:var(--ink-light);margin-bottom:10px;">위에 쓰지 못한 이야기를 자유롭게 적어 주세요.</div>
+      <textarea oninput="piAnswers.extra=this.value" style="width:100%;height:80px;border:1.5px solid var(--border);border-radius:10px;padding:11px 13px;font-size:14px;font-family:'Noto Sans KR',sans-serif;color:var(--ink);background:var(--bg);resize:none;outline:none;line-height:1.8;"></textarea></div>
+    <button id="piSubmitBtn" onclick="submitPreInterview()"
       style="width:100%;padding:15px;background:var(--accent);color:white;border:none;
         border-radius:12px;font-size:15px;font-family:'Noto Sans KR',sans-serif;
         font-weight:700;cursor:pointer;box-shadow:0 4px 14px rgba(200,119,58,0.3);">
@@ -9378,12 +9414,23 @@ function renderPreInterviewForm(role, student, token) {
     </button>`;
 }
 
-async function submitPreInterview(role, student, token) {
-  await saveToSheet('사전상담신청', {
+let piSending=false;
+async function submitPreInterview() {
+  const {role, student, token} = window._pi || {};
+  if(!role) return;
+  if(piSending) return; piSending=true;
+  const pb=document.getElementById('piSubmitBtn'); ssBusy(pb,true,'전달하는 중이에요…'); const t0=Date.now();
+  const sent = await saveToSheet('사전상담신청', {
     type:'사전상담신청', name:student, role: role==='student'?'학생':'학부모',
     submittedAt:new Date().toISOString(), token:token||'',
-    q1: piAnswers.q1||'', q2: piAnswers.q2||'', q3: piAnswers.q3||''
+    q1: piAnswers.q1||'', q2: piAnswers.q2||'', q3: piAnswers.q3||'',
+    prefDate: piAnswers.prefDate||'', prefTime: piAnswers.prefTime||'', extra: piAnswers.extra||''
   });
+  if(sent && sent.ok===false){
+    showToast(sent.reason==='network' ? '전달하지 못했어요. 인터넷을 확인하고 다시 눌러 주세요' : '이 링크로는 전달할 수 없어요. 선생님께 새 링크를 부탁드려요');
+    piSending=false; ssBusy(pb,false); return;
+  }
+  if(Date.now()-t0<700) await new Promise(r=>setTimeout(r,700-(Date.now()-t0)));
   document.getElementById('piQContainer').style.display='none';
   document.getElementById('piDone').style.display='block';
 }
@@ -9408,8 +9455,9 @@ async function loadPreReq() {
           color:${r.role==='학생'?'var(--blue)':'var(--green)'};margin-bottom:6px;">
           ${r.role} · ${r.submittedAt?new Date(r.submittedAt).toLocaleString('ko-KR'):''}
         </div>
-        ${[r.q1,r.q2,r.q3].filter(Boolean).map(q=>
-          `<div style="font-size:13px;color:var(--ink);margin-bottom:4px;line-height:1.6;">· ${q}</div>`
+        ${(r['희망일자']||r['희망시간'])?`<div style="font-size:12px;color:var(--accent);font-weight:700;margin-bottom:4px;">🗓 희망 ${esc([String(r['희망일자']||'').slice(0,10),r['희망시간']||''].filter(Boolean).join(' '))}</div>`:''}
+        ${[r.q1,r.q2,r.q3,r['덧붙임']].filter(Boolean).map(q=>
+          `<div style="font-size:13px;color:var(--ink);margin-bottom:4px;line-height:1.6;">· ${esc(q)}</div>`
         ).join('') || '<div style="font-size:12px;color:var(--ink-faint);">내용 없음</div>'}
       </div>`).join('');
   } catch(e) {
@@ -9469,20 +9517,12 @@ async function saveToSheet(type, data){
 // 시트에서 최근 데이터를 가져와 방금 저장한 건이 반영됐는지 대조
 async function syncFromSheet(){
   if(!APP.gasUrl){showToast('구글 시트 URL을 먼저 설정해주세요');return;}
-  showLoading('구글 시트에서 데이터를 불러오는 중...');
+  showLoading('구글 시트에서 학생 명단과 응답을 불러오는 중...');
   try{
-    const res = await fetch(`${APP.gasUrl}?type=survey${KQ()}`);
-    const rows = await res.json();
-    const q = outboxSummary();
-    const pending = q.length;
-    if(rows.length===0 && pending>0){
-      showToast(`⚠️ 시트가 비어 있습니다. 저장 시도 ${pending}건 — GAS 배포 권한을 확인하세요.`);
-    } else {
-      showToast(`시트 ${rows.length}건 확인 · 로컬 저장 시도 ${pending}건 ✓`);
-    }
-  }catch(e){
-    showToast('동기화 실패. GAS URL·배포 권한을 확인하세요.');
-  }
+    await syncFromGoogleSheet();
+    const onStu = document.getElementById('pgStudent')?.classList.contains('active');
+    if(onStu && APP.currentStudent && STUDENTS[APP.currentStudent]) openStudent(APP.currentStudent);
+  }catch(e){ showToast('동기화 실패. GAS URL·배포 권한을 확인하세요.'); }
   finally{ hideLoading(); }
 }
 
