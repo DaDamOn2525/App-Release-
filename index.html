@@ -920,7 +920,7 @@ body.monitor-mode .pv-watermark { display:none; }
 </style>
 </head>
 <body>
-<div style="position:fixed;right:10px;bottom:10px;z-index:9999;padding:5px 9px;border-radius:8px;background:var(--ink);color:white;font-size:10px;opacity:.75;">Counseling V12.1 · 학생 표현 팝업 반영</div>
+<div id="verBadge" style="position:fixed;right:10px;bottom:10px;z-index:9999;padding:5px 9px;border-radius:8px;background:var(--ink);color:white;font-size:10px;opacity:.75;">Counseling V12.1 · 학생 표현 팝업 반영</div>
 
 <!-- 비밀번호 오버레이 -->
 <div class="pw-overlay" id="pwOverlay">
@@ -5973,7 +5973,7 @@ function initStudentMode() {
   if(mode !== 'student') return;
 
   // 교사 UI 숨기기
-  document.querySelector('.nav').style.display='none'; const _bg=document.getElementById('v112DbBadge'); if(_bg) _bg.style.display='none';
+  document.querySelector('.nav').style.display='none'; ['v112DbBadge','verBadge'].forEach(i=>{const _b=document.getElementById(i); if(_b) _b.style.display='none';});
   document.querySelectorAll('.page').forEach(p=>p.style.display='none');
   document.getElementById('studentSurveyMode').style.display='block';
 
@@ -5988,6 +5988,25 @@ function initStudentMode() {
   setupStudentIdentity(params);
 }
 
+// ── 학생·학부모에게 먼저 보여 주는 안내문(누가 읽고, 어디에 쓰고, 인계·삭제는 어떻게 하는지) ──
+function privacyNoticeHtml(role){
+  const who = role==='parent' ? '자녀' : '내';
+  const li = t => `<li style="margin-bottom:3px;">${t}</li>`;
+  const items = role==='parent' ? [
+    li('적어 주신 내용은 <b>담임 선생님과, 학생을 돕는 학교 선생님들만</b> 볼 수 있습니다. 학교 밖에 공개되지 않습니다.'),
+    li('상담을 준비하는 데에만 쓰이며, 쓰고 싶은 만큼만 적으셔도 됩니다.'),
+    li('학년이 바뀌면 <b>새 학년 담임 선생님께 인계</b>될 수 있습니다. 원하지 않으시면 담임 선생님께 알려 주세요. 삭제해 드립니다.')
+  ] : [
+    li('내가 쓴 내용은 <b>담임 선생님과, 나를 돕는 학교 선생님들만</b> 볼 수 있어요. 학교 밖에는 공개되지 않아요.'),
+    li('상담을 준비하는 데에만 쓰이고, 쓰고 싶은 만큼만 써도 괜찮아요. 안 써도 돼요.'),
+    li('학년이 바뀌면 <b>새 학년 담임 선생님께 인계</b>될 수 있어요. 원하지 않으면 담임 선생님께 알려 주세요. <b>삭제해 줄게요.</b>')
+  ];
+  const help = role==='parent' ? '' : `<div style="margin-top:8px;padding-top:8px;border-top:1px dashed var(--border);">지금 많이 힘들거나 안전이 걱정되는 일이 있다면, 설문을 기다리지 말고 <b>바로 선생님께 말해 주세요.</b> 청소년상담전화 <b>1388</b>(24시간)도 있어요.</div>`;
+  return `<div id="privacyNotice" style="background:var(--paper);border:1px solid var(--border);border-left:4px solid var(--green);border-radius:12px;padding:13px 15px;margin:0 0 12px;font-size:12.5px;line-height:1.75;color:var(--ink);">
+    <div style="font-weight:800;color:var(--green);margin-bottom:5px;">🔒 시작하기 전에 알려 드려요</div>
+    <ul style="margin:0;padding-left:18px;">${items.join('')}</ul>${help}</div>`;
+}
+
 // 누구의 응답인지 확인하는 단계: 개인 링크(token)가 있으면 자동, 없고 반(cls)만 있으면 번호 입력으로 확인합니다.
 const ssIdentity = {token:'', cls:'', num:'', ok:false, preview:false};
 async function setupStudentIdentity(params){
@@ -5999,6 +6018,7 @@ async function setupStudentIdentity(params){
   box.style.cssText = 'max-width:600px;margin:14px auto 0;padding:0 16px;';
   const cont = document.getElementById('ssQContainer');
   cont.parentNode.insertBefore(box, cont);
+  box.insertAdjacentHTML('beforebegin', '<div style="max-width:600px;margin:14px auto 0;padding:0 16px;">'+privacyNoticeHtml('student')+'</div>');
   if(gas) APP.gasUrl = gas;
   const card = (html, tone) => `<div style="background:var(--${tone||'paper'}-pale, var(--paper));border:1px solid var(--border);border-radius:12px;padding:12px 14px;font-size:13px;line-height:1.8;color:var(--ink);">${html}</div>`;
   if(!gas){
@@ -9419,7 +9439,7 @@ async function initPreInterviewMode() {
   const params = new URLSearchParams(location.search);
   const gasUrl = params.get('gas') || '';
   const token = params.get('token') || '';
-  document.querySelector('.nav').style.display='none'; const _bg=document.getElementById('v112DbBadge'); if(_bg) _bg.style.display='none';
+  document.querySelector('.nav').style.display='none'; ['v112DbBadge','verBadge'].forEach(i=>{const _b=document.getElementById(i); if(_b) _b.style.display='none';});
   document.querySelectorAll('.page').forEach(p=>p.style.display='none');
   document.getElementById('preInterviewMode').style.display='block';
   if(gasUrl) APP.gasUrl = gasUrl;
@@ -9452,7 +9472,7 @@ function renderPreInterviewForm(role, student, token) {
   window._pi = {role, student, token};
   const qs = PI_QUESTIONS[role];
   const container = document.getElementById('piQContainer');
-  container.innerHTML = qs.map((q,idx)=>`
+  container.innerHTML = privacyNoticeHtml(role==='student'?'student':'parent') + qs.map((q,idx)=>`
     <div style="background:var(--paper);border:1.5px solid var(--border);border-radius:14px;
       padding:18px 16px;margin-bottom:12px;box-shadow:0 2px 8px var(--shadow);">
       <div style="font-size:10px;letter-spacing:2px;color:var(--accent);font-weight:700;margin-bottom:5px;">
