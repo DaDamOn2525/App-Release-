@@ -33,6 +33,17 @@ html,body{height:100%;background:var(--bg);font-family:'Noto Sans KR',sans-serif
 .nav{position:fixed;top:0;left:0;right:0;height:var(--nav-h);background:var(--ink);
   display:flex;align-items:center;padding:0 16px;gap:10px;z-index:200;}
 
+/* 좁은 화면: 탭 줄이 사라지지 않도록 부제·학급 입력·연결 표시를 단계적으로 접습니다 */
+.nav-tabs{min-width:0;}
+.app-copyright{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;height:20px;line-height:16px;}
+@media(max-width:1020px){.nav-brand{display:none;} .nav{padding:0 10px;gap:8px;}}
+@media(max-width:760px){#navClassInput{display:none;} .nav-divider{display:none;} .gas-status{display:none;} .nav-btn{padding:4px 8px;font-size:11px;}}
+@media(max-width:480px){.nav-tab{padding:6px 9px;font-size:12px;}}
+/* 지난 기록 함께 보기 팝업 */
+#briefingRewindModal{display:none;position:fixed;inset:0;z-index:10050;background:rgba(0,0,0,.42);align-items:center;justify-content:center;padding:18px;}
+#briefingRewindModal.show{display:flex;}
+#briefingRewindModal .modal-box{background:var(--paper);border-radius:14px;padding:18px;width:100%;box-shadow:0 10px 30px rgba(0,0,0,.25);}
+
 /* ══════════════ PAGES ══════════════ */
 .page{display:none;position:fixed;top:var(--nav-total);left:0;right:0;bottom:0;overflow-y:auto;}
 .page.active{display:block;animation:fadeIn 0.25s ease;}
@@ -930,7 +941,7 @@ body.monitor-mode .pv-watermark { display:none; }
 <!-- ══════════ NAV ══════════ -->
 <div class="nav">
   <div class="nav-title" style="display:flex;align-items:center;gap:8px;flex-shrink:0;">
-    마음을 잇는 징검다리
+    <span class="nav-brand">마음을 잇는 징검다리</span>
     <input id="navClassInput" type="text"
       placeholder="학년·반 입력"
       value=""
@@ -964,7 +975,7 @@ body.monitor-mode .pv-watermark { display:none; }
 <div class="app-copyright" style="background:var(--ink);position:fixed;
   top:var(--nav-h);left:0;right:0;z-index:199;font-size:9px;
   padding:2px 16px;border-bottom:1px solid rgba(255,255,255,0.05);">
-  마음을 잇는 징검다리  ·  · 교육 목적 전용
+  마음을 잇는 징검다리  · 교육 목적 전용
 </div>
 
 <!-- ══════════ PAGE: 대시보드 ══════════ -->
@@ -1726,6 +1737,11 @@ body.monitor-mode .pv-watermark { display:none; }
         <div class="field-label" style="margin-bottom:0;">등록된 학생 <span id="studentCountBadge"
           style="background:var(--accent);color:white;padding:1px 8px;border-radius:10px;font-size:11px;margin-left:6px;">0명</span>
         </div>
+        <button onclick="uploadRosterToSheet()" title="이 명렬을 구글 시트의 학생명단에 올립니다"
+          style="font-size:11px;color:var(--green);background:none;border:1px solid var(--green);
+            border-radius:6px;padding:3px 10px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;margin-left:auto;margin-right:6px;">
+          ☁️ 시트에 올리기
+        </button>
         <button onclick="clearAllStudents()"
           style="font-size:11px;color:var(--red);background:none;border:1px solid var(--red);
             border-radius:6px;padding:3px 10px;cursor:pointer;font-family:'Noto Sans KR',sans-serif;">
@@ -3802,13 +3818,13 @@ body.monitor-mode .pv-watermark { display:none; }
  *
  * 설계 원칙
  *  - 학생이 쓰는 요청(키 없이 가능): GET ping / resolvePersonalLink / lookupStudent, POST survey / 사전상담신청
- *  - 담임만 쓰는 요청(관리 키 필요): GET bootstrap / stats / survey / issuePersonalLink / issueClassLinks / 사전상담신청,
+ *  - 담임만 쓰는 요청(관리 키 필요): GET bootstrap / stats / survey / issuePersonalLink / issueClassLinks / registerStudents / 사전상담신청,
  *    POST observation / interview / journal
  *  - 학생 응답 원문은 수정하지 않고 쌓기만 합니다(AI·규칙이 자동 확정하지 않음).
  *  - 위험 판정은 이 서버에서 하지 않습니다(앱의 안전 신호 안내가 담당).
  */
 
-var VERSION = 'V11.1-rebuild-3';
+var VERSION = 'V11.1-rebuild-4';
 var TZ = 'Asia/Seoul';
 // ★ 관리 키: 아래 따옴표 안을 본인만 아는 짧은 문구로 바꾸세요. 한글도 됩니다(예: '바람커피'). 앱 설정 탭의 '관리 키'에도 똑같이 입력합니다.
 //   띄어쓰기는 무시되니 붙여 쓰는 것이 편하고, 따옴표(')는 지우지 마세요.
@@ -3856,6 +3872,7 @@ function doGet(e) {
     if (type === 'survey') return json_(readRows_(TAB.responses).slice(-200));
     if (type === 'issuePersonalLink') return json_(issueLink_(p.name, p.role));
     if (type === 'issueClassLinks') return json_(issueClassLinks_(p.cls));
+    if (type === 'registerStudents') return json_(registerStudents_(p));
     if (type === TAB.preReq) {
       var name = String(p.name || '').trim();
       return json_(readRows_(TAB.preReq).filter(function (r) { return !name || String(r.name) === name; }));
@@ -4016,6 +4033,36 @@ function lookupStudent_(cls, num) {
   return { ok: true, masked: masked };
 }
 
+// 앱의 학생 명렬(번호·이름)을 학생명단 탭에 올립니다. 같은 학년·반·번호가 이미 있으면 건너뜁니다.
+function registerStudents_(p) {
+  var year = String(p.year || '').trim(), grade = String(p.grade || '').trim(), cls = String(p.cls || '').trim();
+  var list = [];
+  try { list = JSON.parse(String(p.students || '[]')); } catch (err) { list = []; }
+  if (!grade || !cls) return { ok: false, message: '학년과 반을 알 수 없습니다. 설정 탭의 학급 정보를 먼저 입력해 주세요.' };
+  if (!list.length) return { ok: false, message: '올릴 학생이 없습니다.' };
+  var lock = LockService.getScriptLock();
+  lock.waitLock(20000);
+  var added = 0, skipped = 0;
+  try {
+    var existing = visibleStudents_();
+    var pad2 = function (v) { v = String(v); return v.length &lt; 2 ? '0' + v : v; };
+    list.forEach(function (s) {
+      var num = String(s.num || '').trim(), name = String(s.name || '').trim();
+      if (!num || !name) return;
+      var dup = existing.some(function (r) {
+        return String(r['학년']).trim() === grade &amp;&amp; String(r['반']).trim() === cls &amp;&amp; String(r['번호']).trim() === num;
+      });
+      if (dup) { skipped++; return; }
+      appendObj_(TAB.students, {
+        student_id: (year ? year + '-' : '') + grade + '-' + pad2(cls) + '-' + pad2(num),
+        '학년도': year, '학년': grade, '반': cls, '번호': num, '학생명': name, '링크_활성': 'TRUE', '등록일': todayIso_()
+      });
+      added++;
+    });
+  } finally { lock.releaseLock(); }
+  return { ok: true, added: added, skipped: skipped };
+}
+
 function issueClassLinks_(cls) {
   var c = String(cls || '').trim();
   if (!c) return { ok: false, message: '반을 입력해 주세요.' };
@@ -4159,6 +4206,11 @@ function json_(obj) {
         <div style="background:var(--green-pale);border-left:3px solid var(--green);
           border-radius:0 8px 8px 0;padding:10px 14px;margin-top:10px;font-size:12px;">
           ✅ 등록 후 <b>우리 반 학생들</b> 탭에서 이름이 보이면 완료입니다.
+        </div>
+        <div style="background:var(--blue-pale);border-left:3px solid var(--blue);
+          border-radius:0 8px 8px 0;padding:10px 14px;margin-top:10px;font-size:12px;">
+          ☁️ <b>시트에 올리기</b> — 설정 탭 "등록된 학생" 위의 <b>시트에 올리기</b>를 눌러야 구글 시트(01_학생명단_DB)에 학생이 생기고, 설문 개인 링크를 만들 수 있습니다.
+          먼저 설정 탭 학급 정보에 <b>"1학년 7반"</b>처럼 학년과 반을 적어 두세요. 이미 올린 번호는 건너뜁니다.
         </div>
       </div>
     </div>
@@ -5809,6 +5861,28 @@ function downloadQR() {
 
 
 const escH=v=>String(v==null?'':v).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+
+// 앱의 학생 명렬을 시트(01_학생명단_DB)에 올립니다. 학년·반은 설정 탭의 학급 정보(예: 1학년 7반)에서 읽습니다.
+async function uploadRosterToSheet(){
+  if(demoBlock()) return;
+  if(!APP.gasUrl){ showToast('설정 탭에서 구글 시트를 먼저 연결해 주세요'); return; }
+  const roster = getRoster();
+  if(!roster.length){ showToast('등록된 학생이 없습니다'); return; }
+  const ci = (document.getElementById('classInfo')?.value || localStorage.getItem('classInfo') || '');
+  const g = ci.match(/(\d+)\s*학년/), c = ci.match(/(\d+)\s*반/);
+  if(!g || !c){ showToast('학급 정보에 "1학년 7반"처럼 학년과 반을 입력해 주세요'); return; }
+  const year = (localStorage.getItem('schoolYear') || document.getElementById('schoolYear')?.value || String(new Date().getFullYear())).replace(/[^0-9]/g,'').slice(0,4);
+  if(!confirm(`${g[1]}학년 ${c[1]}반 ${roster.length}명을 구글 시트 학생명단에 올립니다.\n이미 같은 번호가 있으면 건너뜁니다.`)) return;
+  try{
+    const students = JSON.stringify(roster.map(s=>({num:s.num, name:s.name})));
+    const res = await fetch(`${APP.gasUrl}?type=registerStudents&year=${encodeURIComponent(year)}&grade=${g[1]}&cls=${c[1]}&students=${encodeURIComponent(students)}${KQ()}`);
+    const d = await res.json();
+    if(!d.ok) throw new Error(d.message || (d.error==='unauthorized' ? '관리 키를 확인해 주세요' : '실패'));
+    showToast(`시트에 ${d.added}명을 올렸습니다${d.skipped?` (이미 있는 ${d.skipped}명은 건너뜀)`:''} ✓`);
+    await syncFromGoogleSheet();
+  }catch(e){ showToast('시트에 올리지 못했습니다: '+e.message); }
+}
+
 // ── 학급 개인 링크 일괄 발급 ────────────────────────────────
 let _classLinkRows = [];
 async function issueClassLinks(){
@@ -6812,7 +6886,7 @@ function renderParentViewer() {
       </div>
     </div>
 
-    <div class="pv-ornament">· · ·</div>
+    <div class="pv-ornament">·</div>
 
     <!-- 마음의 지형도 -->
     <div class="pv-section">
@@ -6843,7 +6917,7 @@ function renderParentViewer() {
       ${futureText ? `<div class="pv-interpret">${futureText}</div>` : ''}
     </div>` : ''}
 
-    <div class="pv-ornament">· · ·</div>
+    <div class="pv-ornament">·</div>
 
     <!-- 발견된 강점 -->
     ${strengths.length ? `
@@ -6875,7 +6949,7 @@ function renderParentViewer() {
       </div>
     </div>` : ''}
 
-    <div class="pv-ornament">· · ·</div>
+    <div class="pv-ornament">·</div>
 
     <!-- 담임의 한마디 — 담임이 실제로 작성했을 때만 표시 -->
     ${teacherMsg ? `
