@@ -1662,12 +1662,12 @@ body.monitor-mode .pv-watermark { display:none; }
       <button class="field-tab" id="ftab1" onclick="switchFieldTab(1)"
         style="flex:1;padding:9px;font-size:12px;font-family:'Noto Sans KR',sans-serif;
           border:none;cursor:pointer;transition:all 0.2s;background:var(--bg);color:var(--ink-light);border-left:1px solid var(--border);">
-        📋 일괄 붙여넣기
+        📁 엑셀/CSV 업로드
       </button>
       <button class="field-tab" id="ftab2" onclick="switchFieldTab(2)"
         style="flex:1;padding:9px;font-size:12px;font-family:'Noto Sans KR',sans-serif;
           border:none;cursor:pointer;transition:all 0.2s;background:var(--bg);color:var(--ink-light);border-left:1px solid var(--border);">
-        📁 엑셀/CSV 업로드
+        📥 양식 내보내기
       </button>
     </div>
 
@@ -1701,20 +1701,8 @@ body.monitor-mode .pv-watermark { display:none; }
       </div>
     </div>
 
-    <!-- 탭 1: 일괄 붙여넣기 -->
+    <!-- 탭 1: 파일 업로드 -->
     <div id="fpanel1" style="display:none;">
-      <div class="field-label">번호와 이름을 한 줄에 하나씩 입력하세요</div>
-      <textarea id="bulkInput" style="width:100%;height:160px;border:1.5px solid var(--border);
-        border-radius:8px;padding:10px 12px;font-size:13px;font-family:'Noto Sans KR',sans-serif;
-        color:var(--ink);background:var(--bg);resize:none;outline:none;line-height:1.9;margin-bottom:8px;"
-        placeholder="형식 예시 (탭 또는 공백 구분):&#10;1 김서연&#10;2 박준호&#10;3 이다은&#10;&#10;엑셀에서 번호·이름 열 복사 후 바로 붙여넣기 가능"></textarea>
-      <button onclick="bulkAddStudents()" style="width:100%;padding:11px;background:var(--accent);
-        color:white;border:none;border-radius:10px;font-size:14px;
-        font-family:'Noto Sans KR',sans-serif;cursor:pointer;">일괄 등록</button>
-    </div>
-
-    <!-- 탭 2: 파일 업로드 -->
-    <div id="fpanel2" style="display:none;">
       <div id="csvDropZone" onclick="document.getElementById('csvFile').click()"
         ondragover="event.preventDefault();this.style.borderColor='var(--accent)'"
         ondragleave="this.style.borderColor='var(--border)'"
@@ -1725,11 +1713,24 @@ body.monitor-mode .pv-watermark { display:none; }
         <div style="font-size:13px;color:var(--ink-light);line-height:1.8;">
           <b style="color:var(--accent);">클릭</b>하거나 파일을 드래그하세요<br>
           .xlsx, .csv, .xls 지원<br>
-          <span style="font-size:11px;">첫 번째 열: 번호 / 두 번째 열: 이름</span>
+          <span style="font-size:11px;">나이스에서 받은 엑셀 파일을 그대로 올려도 됩니다 (번호·성명 열을 자동으로 찾습니다)</span>
         </div>
       </div>
       <input type="file" id="csvFile" accept=".csv,.xlsx,.xls" style="display:none;" onchange="handleCsvFile(event)">
       <div id="csvPreview" style="display:none;margin-top:10px;"></div>
+    </div>
+
+    <!-- 탭 2: 양식 내보내기 -->
+    <div id="fpanel2" style="display:none;">
+      <div style="border:1.5px solid var(--border);border-radius:10px;padding:18px;background:var(--bg);text-align:center;">
+        <div style="font-size:28px;margin-bottom:8px;">📥</div>
+        <div style="font-size:13px;color:var(--ink-light);line-height:1.9;margin-bottom:12px;">
+          나이스에서 받은 엑셀의 <b>번호·성명</b> 열을 복사해 양식에 붙여 넣고 저장한 뒤,<br>
+          <b>엑셀/CSV 업로드</b>에 올리면 한 번에 등록됩니다.<br>
+          <span style="font-size:11px;">나이스 파일을 그대로 올려도 되며, 이 양식은 열 구성을 맞추고 싶을 때 쓰세요.</span>
+        </div>
+        <button onclick="downloadRosterTemplate()" style="padding:10px 22px;background:var(--accent);color:white;border:none;border-radius:8px;font-size:13px;font-family:'Noto Sans KR',sans-serif;cursor:pointer;">명렬 양식 내려받기 (.csv)</button>
+      </div>
     </div>
 
     <!-- 등록된 학생 목록 -->
@@ -3673,7 +3674,7 @@ body.monitor-mode .pv-watermark { display:none; }
               font-size:12px;font-weight:700;flex-shrink:0;">2</div>
             <div>
               <b>명렬 등록</b> — 우리 반 학생 이름 입력<br>
-              <span style="font-size:12px;color:var(--ink-light);">나이스에서 복사 붙여넣기 가능.</span>
+              <span style="font-size:12px;color:var(--ink-light);">나이스 엑셀을 그대로 올리거나 양식에 붙여 넣어 업로드합니다.</span>
             </div>
           </div>
           <div style="display:flex;align-items:flex-start;gap:12px;padding:10px 14px;
@@ -4207,8 +4208,8 @@ function json_(obj) {
         <b>세 가지 방법 중 하나 선택:</b>
         <ol style="margin-top:8px;">
           <li><b>한 명씩 입력</b> — 번호·이름·성별 직접 입력</li>
-          <li><b>일괄 붙여넣기</b> — 나이스에서 번호·이름 복사 → 그대로 붙여넣기</li>
-          <li><b>엑셀/CSV 업로드</b> — 나이스 명렬 파일 업로드</li>
+          <li><b>양식 내보내기</b> — 번호·이름 양식을 내려받아 나이스 명렬을 붙여 넣고 저장</li>
+          <li><b>엑셀/CSV 업로드</b> — 나이스 명렬 파일(또는 채운 양식)을 올리면 한 번에 등록</li>
         </ol>
         <div style="background:var(--green-pale);border-left:3px solid var(--green);
           border-radius:0 8px 8px 0;padding:10px 14px;margin-top:10px;font-size:12px;">
@@ -8708,7 +8709,7 @@ async function syncFromGoogleSheet(){
     if(count===0){
       const rn = getRoster().length;
       extra = `<br><span style="color:var(--red);">시트 학생명단: ${mt.studentRows!==undefined ? mt.studentRows+'행 (예시 '+(mt.hiddenSample||0)+'행 제외)' : '확인 불가(GAS를 새 버전으로 다시 배포해 주세요)'} · 이 기기의 앱 명렬: ${rn}명<br>`
-        + (rn>0 ? '→ 위 "등록된 학생"의 [☁️ 시트에 올리기]를 눌러 주세요.' : '→ 먼저 학생 명렬을 등록하세요(일괄 붙여넣기). 그다음 [시트에 올리기]를 누릅니다.')
+        + (rn>0 ? '→ 위 "등록된 학생"의 [☁️ 시트에 올리기]를 눌러 주세요.' : '→ 먼저 학생 명렬을 등록하세요(엑셀/CSV 업로드). 그다음 [시트에 올리기]를 누릅니다.')
         + (mt.studentHeaders && !(mt.studentHeaders.includes('학생명')&&mt.studentHeaders.includes('반')) ? `<br>시트 학생명단의 열 이름이 "학생명, 반"과 다릅니다: ${mt.studentHeaders.join(', ')}` : '')
         + '</span>';
     }
@@ -8930,67 +8931,82 @@ function addOneStudent() {
   showToast(`${name} 등록됐습니다 ✓`);
   renderDashboard();
 }
-function bulkAddStudents() {
-  const raw = document.getElementById('bulkInput').value.trim();
-  if (!raw) { showToast('내용을 입력해주세요'); return; }
-  const lines = raw.split('\n').filter(l=>l.trim());
-  const roster = getRoster();
-  let added = 0;
-  lines.forEach(line => {
-    const parts = line.trim().split(/[\t\s]+/);
-    let num='', name='';
-    if (parts.length >= 2 && !isNaN(parts[0])) {
-      num = parts[0]; name = parts.slice(1).join(' ');
-    } else {
-      name = parts.join(' ');
-      num = String(roster.length + added + 1);
-    }
-    if (name && !roster.find(s=>s.name===name)) {
-      roster.push({num, name, gender:''});
-      added++;
-    }
+function downloadRosterTemplate() {
+  const rows=[['번호','이름','성별']]; for(let i=1;i<=30;i++) rows.push([i,'','']);
+  const csv='﻿'+rows.map(r=>r.join(',')).join('\r\n');
+  const url=URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8;'}));
+  const a=document.createElement('a'); a.href=url; a.download='학생명렬_양식.csv'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+  showToast('양식을 내려받았습니다. 번호·이름을 채워 업로드하세요');
+}
+function decodeRosterBuffer(buf) {
+  try { return new TextDecoder('utf-8',{fatal:true}).decode(buf).replace(/^﻿/,''); }
+  catch(e) { return new TextDecoder('euc-kr').decode(buf); }   // 엑셀 'CSV(쉼표로 분리)' 저장본은 대개 CP949
+}
+function csvToRows(text) {
+  const first=(text.split(/\r?\n/)[0]||''); const d=(first.split('\t').length>first.split(',').length)?'\t':',';
+  const rows=[]; let row=[],cur='',q=false;
+  for(let i=0;i<text.length;i++){ const c=text[i];
+    if(q){ if(c==='"'){ if(text[i+1]==='"'){cur+='"';i++;} else q=false; } else cur+=c; }
+    else if(c==='"') q=true;
+    else if(c===d){ row.push(cur); cur=''; }
+    else if(c==='\n'||c==='\r'){ if(c==='\r'&&text[i+1]==='\n') i++; row.push(cur); rows.push(row); row=[]; cur=''; }
+    else cur+=c; }
+  if(cur!==''||row.length){ row.push(cur); rows.push(row); }
+  return rows;
+}
+function rowsToRoster(rows) {
+  rows=rows.map(r=>r.map(c=>String(c==null?'':c).trim()));
+  let h=-1,nc=0,mc=1,gc=2;
+  for(let i=0;i<Math.min(rows.length,15);i++){
+    const n=rows[i].findIndex(c=>/^번\s*호$/.test(c)), m=rows[i].findIndex(c=>/^(성\s*명|이\s*름|학생명)$/.test(c));
+    if(m>=0){ h=i; mc=m; nc=n; gc=rows[i].findIndex(c=>/^성\s*별$/.test(c)); break; }
+  }
+  const out=[]; let k=0;
+  rows.slice(h+1).forEach((r,idx)=>{
+    if(h<0 && idx===0 && r[0] && isNaN(r[0])) return;       // 머리글 추정
+    const name=(r[mc]||'').replace(/\s+/g,' ').trim(); if(!name) return;
+    k++; const num=(nc>=0&&r[nc]&&!isNaN(r[nc]))?String(Number(r[nc])):String(k);
+    const g=gc>=0?r[gc]:(r[2]||''); out.push({num,name,gender:/^(남|여)/.test(g)?g[0]:''});
   });
-  roster.sort((a,b)=>Number(a.num)-Number(b.num));
-  saveRoster(roster);
-  document.getElementById('bulkInput').value='';
-  showToast(`${added}명 등록됐습니다 ✓`);
-  renderDashboard();
+  return out;
 }
-function handleCsvFile(e) {
-  const file = e.target.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = ev => parseCsvText(ev.target.result, file.name);
-  reader.readAsText(file, 'UTF-8');
+function loadSheetJS(cb) {
+  if(window.XLSX) return cb(true);
+  const sc=document.createElement('script'); sc.src='https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
+  sc.onload=()=>cb(true); sc.onerror=()=>cb(false); document.head.appendChild(sc);
 }
+function processRosterFile(file) {
+  if(!file) return;
+  const isX=/\.xlsx?$/i.test(file.name); const reader=new FileReader();
+  reader.onload=ev=>{
+    if(!isX){ showRosterPreview(rowsToRoster(csvToRows(decodeRosterBuffer(ev.target.result))),file.name); return; }
+    loadSheetJS(ok=>{
+      if(!ok){ showToast('엑셀 파일을 읽는 도구를 불러오지 못했습니다. 엑셀에서 "CSV로 저장" 후 올려 주세요'); return; }
+      try{ const wb=XLSX.read(ev.target.result,{type:'array'}); const ws=wb.Sheets[wb.SheetNames[0]];
+        showRosterPreview(rowsToRoster(XLSX.utils.sheet_to_json(ws,{header:1,defval:'',raw:false})),file.name);
+      }catch(e){ showToast('파일을 읽지 못했습니다: '+e.message); }
+    });
+  };
+  reader.readAsArrayBuffer(file);
+}
+function handleCsvFile(e) { processRosterFile(e.target.files[0]); e.target.value=''; }
 function handleCsvDrop(e) {
   e.preventDefault();
   document.getElementById('csvDropZone').style.borderColor='var(--border)';
-  const file = e.dataTransfer.files[0];
-  if (!file) return;
-  const reader = new FileReader();
-  reader.onload = ev => parseCsvText(ev.target.result, file.name);
-  reader.readAsText(file, 'UTF-8');
+  processRosterFile(e.dataTransfer.files[0]);
 }
-function parseCsvText(text, filename) {
-  const lines = text.split('\n').filter(l=>l.trim());
-  const preview = [];
-  lines.forEach((line, idx) => {
-    if (idx===0 && isNaN(line.split(/[,\t]/)[0])) return; // 헤더 스킵
-    const parts = line.split(/[,\t]/).map(p=>p.trim().replace(/"/g,''));
-    if (parts.length >= 2) preview.push({num:parts[0]||String(idx), name:parts[1], gender:parts[2]||''});
-    else if (parts.length===1 && parts[0]) preview.push({num:String(idx+1), name:parts[0], gender:''});
-  });
+function showRosterPreview(preview, filename) {
   const prevEl = document.getElementById('csvPreview');
   prevEl.style.display = 'block';
+  if(!preview.length){ prevEl.innerHTML='<div style="background:var(--red-pale);border:1px solid var(--red);border-radius:8px;padding:10px 14px;font-size:13px;color:var(--red);">학생 이름을 찾지 못했습니다. 머리글에 "번호", "성명"(또는 "이름")이 있는지 확인해 주세요.</div>'; prevEl._data=null; return; }
   prevEl.innerHTML = `
     <div style="background:var(--green-pale);border:1px solid var(--green);border-radius:8px;
       padding:10px 14px;font-size:13px;color:var(--green);margin-bottom:8px;">
-      ✓ <b>${preview.length}명</b> 인식됨 — ${filename}
+      ✓ <b>${preview.length}명</b> 인식됨 — ${escH(filename)}
     </div>
     <div style="max-height:120px;overflow-y:auto;font-size:12px;color:var(--ink-light);
       border:1px solid var(--border);border-radius:8px;padding:8px 10px;margin-bottom:8px;">
-      ${preview.slice(0,10).map(s=>`${s.num}. ${s.name}`).join(' / ')}${preview.length>10?` ... 외 ${preview.length-10}명`:''}
+      ${preview.slice(0,10).map(s=>`${escH(s.num)}. ${escH(s.name)}`).join(' / ')}${preview.length>10?` ... 외 ${preview.length-10}명`:''}
     </div>
     <button onclick="confirmCsvImport()" style="width:100%;padding:10px;background:var(--green);
       color:white;border:none;border-radius:8px;font-size:13px;
