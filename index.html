@@ -1727,7 +1727,7 @@ body.monitor-mode .pv-watermark { display:none; }
         <div style="font-size:13px;color:var(--ink-light);line-height:1.9;margin-bottom:12px;">
           나이스에서 받은 엑셀의 <b>번호·성명</b> 열을 복사해 양식에 붙여 넣고 저장한 뒤,<br>
           <b>엑셀/CSV 업로드</b>에 올리면 한 번에 등록됩니다.<br>
-          <span style="font-size:11px;">나이스 파일을 그대로 올려도 되며, 이 양식은 열 구성을 맞추고 싶을 때 쓰세요.</span>
+          <span style="font-size:11px;">번호는 학급 번호 그대로 두고, <b>전출 등으로 비는 번호는 이름 칸을 비워 두세요</b>(이름이 없는 줄은 건너뜁니다). 나이스 파일은 그대로 올려도 됩니다.</span>
         </div>
         <button onclick="downloadRosterTemplate()" style="padding:10px 22px;background:var(--accent);color:white;border:none;border-radius:8px;font-size:13px;font-family:'Noto Sans KR',sans-serif;cursor:pointer;">명렬 양식 내려받기 (.csv)</button>
       </div>
@@ -8956,7 +8956,7 @@ function csvToRows(text) {
 }
 function rowsToRoster(rows) {
   rows=rows.map(r=>r.map(c=>String(c==null?'':c).trim()));
-  let h=-1,nc=0,mc=1,gc=2;
+  let h=-1,nc=0,mc=1,gc=2; /* 번호는 학급 번호 그대로 보존(전출로 빠진 번호는 건너뜀) */
   for(let i=0;i<Math.min(rows.length,15);i++){
     const n=rows[i].findIndex(c=>/^번\s*호$/.test(c)), m=rows[i].findIndex(c=>/^(성\s*명|이\s*름|학생명)$/.test(c));
     if(m>=0){ h=i; mc=m; nc=n; gc=rows[i].findIndex(c=>/^성\s*별$/.test(c)); break; }
@@ -8965,7 +8965,7 @@ function rowsToRoster(rows) {
   rows.slice(h+1).forEach((r,idx)=>{
     if(h<0 && idx===0 && r[0] && isNaN(r[0])) return;       // 머리글 추정
     const name=(r[mc]||'').replace(/\s+/g,' ').trim(); if(!name) return;
-    k++; const num=(nc>=0&&r[nc]&&!isNaN(r[nc]))?String(Number(r[nc])):String(k);
+    const hasN=(nc>=0&&r[nc]&&!isNaN(r[nc])); const num=hasN?String(Number(r[nc])):String(Math.max(0,...out.map(x=>Number(x.num)||0))+1);
     const g=gc>=0?r[gc]:(r[2]||''); out.push({num,name,gender:/^(남|여)/.test(g)?g[0]:''});
   });
   return out;
