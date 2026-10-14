@@ -7623,7 +7623,7 @@ function renderDashboard() {
   const emoCount={};
   all.forEach(([,s])=>(s.emotions||[]).forEach(e=>{emoCount[e]=(emoCount[e]||0)+1;}));
   const max=Math.max(...Object.values(emoCount),1);
-  document.getElementById('emotionChart').innerHTML=Object.entries(emoCount).sort((a,b)=>b[1]-a[1]).slice(0,8).map(([e,cnt])=>`
+  document.getElementById('emotionChart').innerHTML=!Object.keys(emoCount).length?'<div style="font-size:13px;color:var(--ink-faint);padding:14px 0;text-align:center;line-height:1.8;">아직 설문 응답이 없습니다.<br><span style="font-size:11px;">학생이 제출하면 ↓ 동기화 후 마음 날씨가 여기에 나타납니다</span></div>':Object.entries(emoCount).sort((a,b)=>b[1]-a[1]).slice(0,8).map(([e,cnt])=>`
     <div class="emo-bar-row"><div class="emo-bar-top"><span class="emo-bar-label">${e}</span><span class="emo-bar-cnt" onclick="showEmoStudents('${e}')">${cnt}명 ▾</span></div>
     <div class="emo-track"><div class="emo-fill neu" style="width:${(cnt/max*100).toFixed(0)}%"></div></div></div>`).join('');
 
@@ -7729,7 +7729,7 @@ function openStudent(name) {
   const stuName=document.getElementById('stuName');
   if(stuName) stuName.textContent = name;
   const stuMeta=document.getElementById('stuMeta');
-  if(stuMeta) stuMeta.textContent = s.meta + ' · 설문 ' + (s.records.some(r=>r.type==='survey')?'완료':'미제출');
+  if(stuMeta) stuMeta.textContent = s.meta + ' · 설문 ' + (s.records.some(r=>r.type==='survey')?'완료':'미제출') + ((s.dbMeta&&s.dbMeta.submitCount>1)?` (제출 ${s.dbMeta.submitCount}회 · 최신 응답 사용)`:'');
   const emoBox=document.getElementById('stuEmotions');
   if(emoBox) emoBox.innerHTML = s.emotions.map(e=>
     `<span class="stu-etag" style="border-color:${EMOTION_MAP[e]==='neg'?'var(--red)':EMOTION_MAP[e]==='pos'?'var(--green)':'var(--yellow)'};color:${EMOTION_MAP[e]==='neg'?'var(--red)':EMOTION_MAP[e]==='pos'?'var(--green)':'var(--yellow)'};background:${EMOTION_MAP[e]==='neg'?'var(--red-pale)':EMOTION_MAP[e]==='pos'?'var(--green-pale)':'var(--yellow-pale)'};">${e}</span>`).join('');
@@ -8690,11 +8690,18 @@ function applyDbSnapshot(data){
     });
     const survey={};
     const qMap={Q01:'감정단어',Q02:'학습동기',Q03:'힘든것',Q04:'학교느낌',Q05:'뽐낼것',Q06:'미래자아',Q07:'담임바람'};
+    // 같은 학생이 다시 제출하면 문항마다 가장 늦은 응답을 씁니다(시트의 이전 응답은 지우지 않음).
+    const keyDate={}, subDates=new Set();
     matches.forEach(x=>{
       const q=String(val(x,'question_id','질문ID','question','문항')||'').trim().toUpperCase();
       const key=qMap[q];
-      if(key) survey[key]=val(x,'raw_response','응답','답변','response');
+      if(!key) return;
+      const d=String(val(x,'response_date','date','created_at')||'');
+      if(d) subDates.add(d);
+      if(survey[key]===undefined || d>=(keyDate[key]||'')){ survey[key]=val(x,'raw_response','응답','답변','response'); keyDate[key]=d; }
     });
+    const submitTimes=[...subDates].sort();
+    const submitCount=submitTimes.length;
     // 구형 wide-format 응답도 계속 지원
     if(!Object.keys(survey).length && matches.length){
       const x=matches[matches.length-1];
@@ -8730,7 +8737,7 @@ function applyDbSnapshot(data){
       records,
       dbSource:true,
       legacy:{oldStatus:''},
-      dbMeta:{student_id:sid,등록일:val(r,'등록일','created_at'),최근접촉일:val(r,'최근접촉일','updated_at'),비고:val(r,'담임메모','비고','note')}
+      dbMeta:{student_id:sid,submitCount,lastSubmit:submitTimes[submitTimes.length-1]||'',등록일:val(r,'등록일','created_at'),최근접촉일:val(r,'최근접촉일','updated_at'),비고:val(r,'담임메모','비고','note')}
     };
   });
 
@@ -9107,7 +9114,7 @@ function clearAllStudents() {
 function exportCSV(mode) {
   const year=document.getElementById('archiveYear')?.value||'2026학년도'; const classInfo=localStorage.getItem('classInfo')||'학급'; const teacherName=localStorage.getItem('teacherName')||'담임';
   const headers=['학년도','반','이름','번호','성별','감정단어','학습동기','힘든것','학교느낌','뽐낼것','미래자아','담임바람','도움요청','관찰단서','아직확인되지않은것','후속질문','지원방향','안전확인','면담횟수','최근면담일','비고'];
-  const rows=Object.entries(STUDENTS).map(([name,s])=>{const a=analyzeStudent(s);const rosterInfo=(getRoster().find(r=>r.name===name)||{num:'',gender:''});const interviews=(s.records||[]).filter(r=>r.type==='interview');const last=[...interviews].reverse()[0];return [year,classInfo,name,rosterInfo.num,rosterInfo.gender||'',s.survey?.감정단어||s.emotions?.join('·')||'',s.survey?.학습동기||'',s.survey?.힘든것||'',s.survey?.학교느낌||'',s.survey?.뽐낼것||'',s.survey?.미래자아||'',s.survey?.담임바람||'',s.survey?.도움요청||'',a.observationCues.map(x=>x.text).join(' / '),a.unknownAreas.map(x=>x.text).join(' / '),a.followups.map(x=>x.question).join(' / '),a.supportDirections.map(x=>x.text).join(' / '),a.safety.route!=='none'?'안전 확인 필요':'없음',interviews.length,last?.date||'',''];});
+  const rows=Object.entries(STUDENTS).map(([name,s])=>{const a=analyzeStudent(s);const rosterInfo=(getRoster().find(r=>r.name===name)||{num:'',gender:''});const interviews=(s.records||[]).filter(r=>r.type==='interview');const last=[...interviews].reverse()[0];const _m=String(s.meta||'').match(/^(\d+)\D+(\d+)\D/); const clsLabel=(s.dbSource&&_m)?`${_m[1]}학년 ${_m[2]}반`:classInfo; return [year,clsLabel,name,rosterInfo.num||s.num||'',rosterInfo.gender||'',s.survey?.감정단어||s.emotions?.join('·')||'',s.survey?.학습동기||'',s.survey?.힘든것||'',s.survey?.학교느낌||'',s.survey?.뽐낼것||'',s.survey?.미래자아||'',s.survey?.담임바람||'',s.survey?.도움요청||'',a.observationCues.map(x=>x.text).join(' / '),a.unknownAreas.map(x=>x.text).join(' / '),a.followups.map(x=>x.question).join(' / '),a.supportDirections.map(x=>x.text).join(' / '),a.safety.route!=='none'?'안전 확인 필요':'없음',interviews.length,last?.date||'',''];});
   const csvContent=[headers,...rows].map(row=>row.map(cell=>`"${String(cell).replace(/"/g,'""')}"`).join(',')).join('\n');
   const blob=new Blob(['\uFEFF'+csvContent],{type:'text/csv;charset=utf-8;'}); const url=URL.createObjectURL(blob); const a=document.createElement('a'); a.href=url; a.download=`${year}_${classInfo}_담임인계_${teacherName}_${new Date().toLocaleDateString('ko-KR').replace(/\. /g,'-').replace('.','')}.csv`; a.click(); URL.revokeObjectURL(url); showToast('V11 중립형 CSV 내보내기 완료 ✓'); if(mode==='handover') setTimeout(generateHandover,500);
 }
@@ -9124,29 +9131,17 @@ function handleImportFile(e) {
 
 function processImportCSV(file) {
   const reader = new FileReader();
-  reader.onload = ev => parseImportCSV(ev.target.result);
-  reader.readAsText(file, 'UTF-8');
+  reader.onload = ev => parseImportCSV(decodeRosterBuffer(ev.target.result));   // UTF-8·CP949 자동 판별
+  reader.readAsArrayBuffer(file);
 }
 
 function parseImportCSV(text) {
-  // BOM 제거
-  const clean = text.replace(/^\uFEFF/,'');
-  const lines = clean.split('\n').filter(l=>l.trim());
-  if(lines.length < 2) { showToast('파일 내용이 없습니다'); return; }
-
-  const headers = lines[0].split(',').map(h=>h.replace(/"/g,'').trim());
-  const rows = lines.slice(1).map(line => {
-    const cells = [];
-    let cur='', inQ=false;
-    for(let i=0;i<line.length;i++){
-      if(line[i]==='"') inQ=!inQ;
-      else if(line[i]===','&&!inQ){cells.push(cur.trim());cur='';}
-      else cur+=line[i];
-    }
-    cells.push(cur.trim());
-    const obj={};
-    headers.forEach((h,i)=>obj[h]=cells[i]||'');
-    return obj;
+  // 줄바꿈이 들어간 칸도 읽도록 따옴표를 고려한 분석기를 씁니다.
+  const all = csvToRows(text.replace(/^\uFEFF/,'')).filter(r=>r.some(c=>String(c).trim()));
+  if(all.length < 2) { showToast('파일 내용이 없습니다'); return; }
+  const headers = all[0].map(h=>String(h).trim());
+  const rows = all.slice(1).map(cells => {
+    const obj={}; headers.forEach((h,i)=>obj[h]=String(cells[i]==null?'':cells[i]).trim()); return obj;
   }).filter(r=>r['이름']);
 
   // 현재 명렬과 이름 매칭
@@ -9183,7 +9178,7 @@ function renderImportMatchResult(matched, unmatched, allRows) {
             <label for="imp_${r['이름']}" style="flex:1;font-size:13px;cursor:pointer;">
               <b>${r['이름']}</b>
               <span style="font-size:11px;color:var(--ink-light);margin-left:8px;">
-                ${r['학년도']||''} ${r['반']||''} · ${r['도움방향']||''}
+                ${r['학년도']||''} ${r['반']||''} · ${r['지원방향']||r['도움방향']||''}
               </span>
             </label>
           </div>`).join('')
