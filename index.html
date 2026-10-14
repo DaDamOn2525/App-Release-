@@ -38,7 +38,8 @@ html,body{height:100%;background:var(--bg);font-family:'Noto Sans KR',sans-serif
 .app-copyright{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;height:20px;line-height:16px;}
 @media(max-width:1020px){.nav-brand{display:none;} .nav{padding:0 10px;gap:8px;}}
 @media(max-width:760px){#navClassInput{display:none;} .nav-divider{display:none;} .gas-status{display:none;} .nav-btn{padding:4px 8px;font-size:11px;}}
-@media(max-width:480px){.nav-tab{padding:6px 9px;font-size:12px;}}
+@media(max-width:1180px){.nav-tab .tab-label{display:none;} .nav-tab{padding:6px 11px;font-size:16px;} .nav-tab.active .tab-label{display:inline;font-size:13px;margin-left:4px;} #navStudent .tab-label{display:inline;max-width:70px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;vertical-align:bottom;font-size:12px;}}
+@media(max-width:560px){#navStudent .tab-label{display:none;} #navSyncBtn{font-size:0;padding:4px 10px;} #navSyncBtn::before{content:'↓';font-size:14px;} .nav-tabs{overflow-x:auto;flex-wrap:nowrap;scrollbar-width:none;} .nav-tab{flex:0 0 auto;padding:6px 9px;}}
 /* 지난 기록 함께 보기 팝업 */
 #briefingRewindModal{display:none;position:fixed;inset:0;z-index:10050;background:rgba(0,0,0,.42);align-items:center;justify-content:center;padding:18px;}
 #briefingRewindModal.show{display:flex;}
@@ -954,21 +955,21 @@ body.monitor-mode .pv-watermark { display:none; }
   </div>
   <div class="nav-divider"></div>
   <div class="nav-tabs">
-    <button class="nav-tab active" onclick="goPage('pgDash',this)">🏫 우리 반 학생들</button>
+    <button class="nav-tab active" onclick="goPage('pgDash',this)">🏫<span class="tab-label"> 우리 반 학생들</span></button>
     <div class="student-nav-wrap" id="studentNavWrap">
-      <button class="nav-tab student-nav-tab" id="navStudent" onclick="toggleStudentNav(event)">👤 <span id="navStudentName">학생 선택</span> <span class="student-nav-arrow">▾</span></button>
+      <button class="nav-tab student-nav-tab" id="navStudent" onclick="toggleStudentNav(event)">👤 <span id="navStudentName" class="tab-label">학생 선택</span> <span class="student-nav-arrow">▾</span></button>
       <div class="student-nav-menu" id="studentNavMenu"></div>
     </div>
-    <button class="nav-tab" onclick="goPage('pgSurvey',this)">📝 설문 관리</button>
-    <button class="nav-tab" onclick="goPage('pgParent',this)">🌿 학부모 상담</button>
-    <button class="nav-tab" onclick="goPage('pgFoundation',this)">🧠 상담의 기초</button>
-    <button class="nav-tab" onclick="goPage('pgLibrary',this)">📚 서재</button>
-    <button class="nav-tab" onclick="goPage('pgSettings',this)">⚙️ 설정</button>
-    <button class="nav-tab" onclick="goPage('pgManual',this)">📖 매뉴얼</button>
+    <button class="nav-tab" onclick="goPage('pgSurvey',this)">📝<span class="tab-label"> 설문 관리</span></button>
+    <button class="nav-tab" onclick="goPage('pgParent',this)">🌿<span class="tab-label"> 학부모 상담</span></button>
+    <button class="nav-tab" onclick="goPage('pgFoundation',this)">🧠<span class="tab-label"> 상담의 기초</span></button>
+    <button class="nav-tab" onclick="goPage('pgLibrary',this)">📚<span class="tab-label"> 서재</span></button>
+    <button class="nav-tab" onclick="goPage('pgSettings',this)">⚙️<span class="tab-label"> 설정</span></button>
+    <button class="nav-tab" onclick="goPage('pgManual',this)">📖<span class="tab-label"> 매뉴얼</span></button>
   </div>
   <div class="nav-right">
     <span class="gas-status" id="gasStatus">시트 미연결</span>
-    <button class="nav-btn" onclick="syncFromSheet()" title="시트에서 불러오기">↓ 동기화</button>
+    <button class="nav-btn" id="navSyncBtn" onclick="syncFromSheet()" title="시트에서 불러오기">↓ 동기화</button>
   </div>
 </div>
 <!-- NAV 하단 저작권 -->
@@ -3824,7 +3825,7 @@ body.monitor-mode .pv-watermark { display:none; }
  *  - 위험 판정은 이 서버에서 하지 않습니다(앱의 안전 신호 안내가 담당).
  */
 
-var VERSION = 'V11.1-rebuild-4';
+var VERSION = 'V11.1-rebuild-5';
 var TZ = 'Asia/Seoul';
 // ★ 관리 키: 아래 따옴표 안을 본인만 아는 짧은 문구로 바꾸세요. 한글도 됩니다(예: '바람커피'). 앱 설정 탭의 '관리 키'에도 똑같이 입력합니다.
 //   띄어쓰기는 무시되니 붙여 쓰는 것이 편하고, 따옴표(')는 지우지 마세요.
@@ -3985,13 +3986,14 @@ function savePreReq_(d) {
 
 function bootstrap_() {
   var hide = function (r) { return !(HIDE_SAMPLE_ROWS &amp;&amp; /^SAMPLE_/.test(String(r.student_id || ''))); };
-  var students = readRows_(TAB.students).filter(hide).map(function (r) { delete r['개인링크_token']; return r; });
+  var allStudents = readRows_(TAB.students);
+  var students = allStudents.filter(hide).map(function (r) { delete r['개인링크_token']; return r; });
   return {
     students: students,
     responses: readRows_(TAB.responses).filter(hide),
     counseling: readRows_(TAB.counseling).filter(hide),
     observation: readRows_(TAB.observation).filter(hide),
-    meta: { version: VERSION, fetched_at: new Date().toISOString() }
+    meta: { version: VERSION, fetched_at: new Date().toISOString(), studentRows: allStudents.length, hiddenSample: allStudents.length - students.length, studentHeaders: headersOf_(sheet_(TAB.students)) }
   };
 }
 
@@ -4067,7 +4069,12 @@ function issueClassLinks_(cls) {
   var c = String(cls || '').trim();
   if (!c) return { ok: false, message: '반을 입력해 주세요.' };
   var list = visibleStudents_().filter(function (r) { return String(r['반']).trim() === c; });
-  if (!list.length) return { ok: false, message: c + '반 학생이 명단에 없습니다.' };
+  if (!list.length) {
+    var seen = {};
+    visibleStudents_().forEach(function (r) { seen[String(r['반'])] = 1; });
+    var classes = Object.keys(seen).filter(function (k) { return k !== '' &amp;&amp; k !== 'undefined'; });
+    return { ok: false, message: c + '반 학생이 명단에 없습니다. 시트 학생명단(예시 제외) ' + visibleStudents_().length + '명, 반 값: ' + (classes.join(', ') || '없음') + ' → 설정 탭에서 명렬을 등록하고 [시트에 올리기]를 눌러 주세요.' };
+  }
   var existing = readRows_(TAB.links), byId = {};
   existing.forEach(function (r) {
     if (String(r.role) === 'student' &amp;&amp; String(r.active).toUpperCase() !== 'FALSE') byId[String(r.student_id)] = String(r.token);
@@ -5877,7 +5884,7 @@ async function uploadRosterToSheet(){
     const students = JSON.stringify(roster.map(s=>({num:s.num, name:s.name})));
     const res = await fetch(`${APP.gasUrl}?type=registerStudents&year=${encodeURIComponent(year)}&grade=${g[1]}&cls=${c[1]}&students=${encodeURIComponent(students)}${KQ()}`);
     const d = await res.json();
-    if(!d.ok) throw new Error(d.message || (d.error==='unauthorized' ? '관리 키를 확인해 주세요' : '실패'));
+    if(!d.ok) throw new Error(d.message || (d.error==='unauthorized' ? '관리 키를 확인해 주세요' : (String(d.error||'').startsWith('unknown type') ? 'GAS를 최신 버전으로 다시 배포해 주세요 (매뉴얼의 새 코드 복사 → 새 버전 배포)' : '실패')));
     showToast(`시트에 ${d.added}명을 올렸습니다${d.skipped?` (이미 있는 ${d.skipped}명은 건너뜀)`:''} ✓`);
     await syncFromGoogleSheet();
   }catch(e){ showToast('시트에 올리지 못했습니다: '+e.message); }
@@ -8696,7 +8703,16 @@ async function syncFromGoogleSheet(){
     if(APP.currentStudent && !STUDENTS[APP.currentStudent]) APP.currentStudent=null;
     renderStudentNavMenu();
     if(typeof renderStudentTable==='function') renderStudentTable();
-    if(box) box.innerHTML=`✓ ${count}명 불러오기 완료 · ${new Date().toLocaleTimeString('ko-KR')} · 원본 시트는 변경하지 않음`;
+    const mt = (payload && payload.meta) || {};
+    let extra = '';
+    if(count===0){
+      const rn = getRoster().length;
+      extra = `<br><span style="color:var(--red);">시트 학생명단: ${mt.studentRows!==undefined ? mt.studentRows+'행 (예시 '+(mt.hiddenSample||0)+'행 제외)' : '확인 불가(GAS를 새 버전으로 다시 배포해 주세요)'} · 이 기기의 앱 명렬: ${rn}명<br>`
+        + (rn>0 ? '→ 위 "등록된 학생"의 [☁️ 시트에 올리기]를 눌러 주세요.' : '→ 먼저 학생 명렬을 등록하세요(일괄 붙여넣기). 그다음 [시트에 올리기]를 누릅니다.')
+        + (mt.studentHeaders && !(mt.studentHeaders.includes('학생명')&&mt.studentHeaders.includes('반')) ? `<br>시트 학생명단의 열 이름이 "학생명, 반"과 다릅니다: ${mt.studentHeaders.join(', ')}` : '')
+        + '</span>';
+    }
+    if(box) box.innerHTML=`✓ ${count}명 불러오기 완료 · ${new Date().toLocaleTimeString('ko-KR')} · GAS ${mt.version||'?'} · 원본 시트는 변경하지 않음${extra}`;
     showToast(`실제 DB ${count}명 동기화 완료 ✓`);
   }catch(e){
     if(box) box.innerHTML=`✗ 동기화 실패: ${e.message}`;
